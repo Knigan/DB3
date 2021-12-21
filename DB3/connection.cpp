@@ -10,6 +10,7 @@ Connection::Connection(QWidget *parent) :
     ui->RoleBox->addItem("Студент");
     ui->RoleBox->addItem("Преподаватель");
 
+
     ConnectionInfo info;
     load_ConnectionInfo(info);
     set_host(info.host);
@@ -103,7 +104,13 @@ void Connection::accept() {
        ui->ErrorLabel->setText("Database connection has failed!");
     } else {
         ui->ErrorLabel->setText("Database connection has been finished successfully!");
+        save_ConnectionInfo(info);
+        hide();
+        if (ui->RoleBox->itemText(ui->RoleBox->currentIndex()) == "Студент") {
+            //StudentDialog(this);
+        }
+        else {
+            //TeacherDialog(this);
+        }
     }
-
-    save_ConnectionInfo(info);
 }
