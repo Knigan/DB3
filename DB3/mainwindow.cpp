@@ -6,10 +6,12 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    Connection(this);
+
+    connectionDialog = new Connection(this);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+

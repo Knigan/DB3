@@ -1,11 +1,13 @@
-#include "studentsignin.h"
-#include "ui_studentsignin.h"
+#include "StudentSignIn.h"
+#include "ui_StudentSignIn.h"
 
 StudentSignIn::StudentSignIn(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::StudentSignIn)
 {
+
     ui->setupUi(this);
+    //exec();
 }
 
 StudentSignIn::~StudentSignIn()
@@ -28,4 +30,3 @@ void StudentSignIn::set_surname(const QString& S) {
 void StudentSignIn::set_group(const QString& G) {
     ui->GroupLineEdit->insert(G);
 }
-

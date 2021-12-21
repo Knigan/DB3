@@ -1,10 +1,12 @@
 #ifndef CONNECTION_H
 #define CONNECTION_H
 
+#include "StudentDialog.h"
+#include "TeacherDialog.h"
+
 #include <QDialog>
 #include <QSqlDatabase>
 #include <QSettings>
-#include "studentdialog.h"
 
 namespace Ui {
 class Connection;
@@ -23,6 +25,7 @@ class Connection : public QDialog
     Q_OBJECT
 
 public:
+
     explicit Connection(QWidget *parent = nullptr);
     ~Connection();
     QString get_host();
@@ -36,7 +39,9 @@ public:
     void set_port(int);
     void set_DBName(QString&);
 
+
 private slots:
+
     void accept();
 
 private:
