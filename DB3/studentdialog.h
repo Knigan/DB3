@@ -23,6 +23,12 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class StudentDialog; }
 QT_END_NAMESPACE
 
+struct StudentInfo
+{
+    QString surname;
+    QString group;
+};
+
 class StudentDialog : public QDialog
 {
     Q_OBJECT
@@ -47,6 +53,10 @@ private:
     QSqlDatabase m_db;
     Ui::StudentDialog* m_ui;
     QSettings* m_settings;
+
+    void save_StudentInfo(const StudentInfo&);
+    void load_StudentInfo(StudentInfo&);
+
 
 };
 

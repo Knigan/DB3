@@ -13,6 +13,19 @@ StudentDialog::StudentDialog(QDialog *parent)
     connect(m_ui->deleteMemberButton      , &QPushButton::clicked,this, &StudentDialog::deleteMember);
     connect(m_ui->deleteCollectiveButton  , &QPushButton::clicked,this, &StudentDialog::deleteCollective);
 
+    m_settings = new QSettings("connection_config.ini", QSettings::IniFormat, this);
+    StudentSignIn S;
+    StudentInfo info;
+    load_StudentInfo(info);
+    S.set_surname(info.surname);
+    S.set_group(info.group);
+
+    if (S.exec() == QDialog::Accepted)
+    {
+        info.surname = S.get_surname();
+        info.group = S.get_group();
+        save_StudentInfo(info);
+    }
     exec();
 }
 
@@ -25,7 +38,7 @@ StudentDialog::~StudentDialog()
 void StudentDialog::editProfile()
 {
     //qDebug() << "editProfile";
-    m_studentSignIn_ui = new StudentSignIn(this);
+    //m_studentSignIn_ui = new StudentSignIn(this);
 }
 
 void StudentDialog::addNewMember()
@@ -46,6 +59,19 @@ void StudentDialog::deleteCollective()
 void StudentDialog::exit()
 {
 
+}
+
+
+void StudentDialog::save_StudentInfo(const StudentInfo& info)
+{
+    m_settings->setValue("Surname", info.surname);
+    m_settings->setValue("Group", info.group);
+}
+
+void StudentDialog::load_StudentInfo(StudentInfo& info)
+{
+    info.surname = m_settings->value("Surname").toString();
+    info.group = m_settings->value("Group").toString();
 }
 
 //void StudentDialog::MakeQuery(const QString& a_queryString)
