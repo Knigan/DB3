@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QSqlDatabase>
 #include <QSettings>
+#include "studentdialog.h"
 
 namespace Ui {
 class Connection;

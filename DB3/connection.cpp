@@ -107,7 +107,7 @@ void Connection::accept() {
         save_ConnectionInfo(info);
         hide();
         if (ui->RoleBox->itemText(ui->RoleBox->currentIndex()) == "Студент") {
-            //StudentDialog(this);
+            StudentDialog(this);
         }
         else {
             //TeacherDialog(this);

@@ -11,15 +11,21 @@ CONFIG += c++11
 SOURCES += \
     connection.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    studentdialog.cpp \
+    studentsignin.cpp
 
 HEADERS += \
     connection.h \
-    mainwindow.h
+    mainwindow.h \
+    studentdialog.h \
+    studentsignin.h
 
 FORMS += \
+    StudentDialog.ui \
     connection.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    studentsignin.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
