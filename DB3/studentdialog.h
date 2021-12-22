@@ -2,17 +2,12 @@
 #define STUDENTDIALOG_H
 
 #include <QDialog>
-#include "studentsignin.h"
+#include "signin.h"
 #include <QSettings>
 
 namespace Ui {
 class StudentDialog;
 }
-
-struct StudentInfo {
-    QString surname;
-    QString group;
-};
 
 class StudentDialog : public QDialog
 {
@@ -25,8 +20,6 @@ public:
 private:
     Ui::StudentDialog *ui;
     QSettings* sign_in;
-    void save_StudentInfo(const StudentInfo&);
-    void load_StudentInfo(StudentInfo&);
 };
 
 #endif // STUDENTDIALOG_H

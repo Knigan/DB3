@@ -12,20 +12,20 @@ SOURCES += \
     connection.cpp \
     main.cpp \
     mainwindow.cpp \
-    studentdialog.cpp \
-    studentsignin.cpp
+    signin.cpp \
+    studentdialog.cpp
 
 HEADERS += \
     connection.h \
     mainwindow.h \
-    studentdialog.h \
-    studentsignin.h
+    signin.h \
+    studentdialog.h
 
 FORMS += \
     StudentDialog.ui \
     connection.ui \
     mainwindow.ui \
-    studentsignin.ui
+    signin.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

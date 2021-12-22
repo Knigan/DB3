@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>StudentSignIn</class>
- <widget class="QDialog" name="StudentSignIn">
+ <class>SignIn</class>
+ <widget class="QDialog" name="SignIn">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLineEdit" name="GroupLineEdit">
+  <widget class="QLineEdit" name="PasswordLineEdit">
    <property name="geometry">
     <rect>
      <x>168</x>
@@ -41,8 +41,11 @@
    <property name="text">
     <string/>
    </property>
+   <property name="echoMode">
+    <enum>QLineEdit::Password</enum>
+   </property>
   </widget>
-  <widget class="QLabel" name="GroupLabel">
+  <widget class="QLabel" name="PasswordLabel">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -52,10 +55,10 @@
     </rect>
    </property>
    <property name="text">
-    <string>Группа студента</string>
+    <string>Password</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="SurnameLineEdit">
+  <widget class="QLineEdit" name="LoginLineEdit">
    <property name="geometry">
     <rect>
      <x>168</x>
@@ -84,13 +87,13 @@
     </font>
    </property>
    <property name="text">
-    <string>Вход для студентов</string>
+    <string>Sign in</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
    </property>
   </widget>
-  <widget class="QLabel" name="SurnameLabel">
+  <widget class="QLabel" name="LoginLabel">
    <property name="geometry">
     <rect>
      <x>40</x>
@@ -100,7 +103,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>ФИО студента</string>
+    <string>Login</string>
    </property>
   </widget>
  </widget>
@@ -109,7 +112,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>StudentSignIn</receiver>
+   <receiver>SignIn</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -125,7 +128,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>StudentSignIn</receiver>
+   <receiver>SignIn</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

@@ -6,31 +6,21 @@ StudentDialog::StudentDialog(QWidget *parent) :
     ui(new Ui::StudentDialog)
 {
     ui->setupUi(this);
-    sign_in = new QSettings("connection_config.ini", QSettings::IniFormat, this);
-    StudentSignIn S;
-    StudentInfo info;
-    load_StudentInfo(info);
-    S.set_surname(info.surname);
-    S.set_group(info.group);
+    sign_in = new QSettings("SignIn_config.ini", QSettings::IniFormat, this);
+    SignIn S;
+    SignInInfo info;
+    info.load_SignInInfo(sign_in);
+    S.set_login(info.login);
+    S.set_password(info.password);
     if (S.exec() == QDialog::Accepted) {
-        info.surname = S.get_surname();
-        info.group = S.get_group();
-        save_StudentInfo(info);
+        info.login = S.get_login();
+        info.password = S.get_password();
+        info.save_SignInInfo(sign_in);
+        exec();
     }
-    exec();
 }
 
 StudentDialog::~StudentDialog()
 {
     delete ui;
-}
-
-void StudentDialog::save_StudentInfo(const StudentInfo& info) {
-    sign_in->setValue("Surname", info.surname);
-    sign_in->setValue("Group", info.group);
-}
-
-void StudentDialog::load_StudentInfo(StudentInfo& info) {
-    info.surname = sign_in->value("Surname").toString();
-    info.group = sign_in->value("Group").toString();
 }
