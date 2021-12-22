@@ -8,6 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     connectionDialog = new Connection(this);
+
 }
 
 MainWindow::~MainWindow()

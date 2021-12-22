@@ -2,6 +2,9 @@
 #define STUDENTDIALOG_H
 
 #include "StudentSignIn.h"
+#include "AddMemberDialog.h"
+#include "editprofiledialog.h"
+#include "deletememberdialog.h"
 
 #include <QDialog>
 #include <QDialog>
@@ -49,7 +52,7 @@ private slots:
 private:
 
     //void MakeQuery(const QString& a_queryString);
-    StudentSignIn* m_studentSignIn_ui;
+
     QSqlDatabase m_db;
     Ui::StudentDialog* m_ui;
     QSettings* m_settings;
