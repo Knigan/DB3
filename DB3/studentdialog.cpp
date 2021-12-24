@@ -7,11 +7,13 @@ StudentDialog::StudentDialog(QDialog *parent)
 {
     m_ui->setupUi(this);
 
-
     connect(m_ui->editProfileButton     , &QPushButton::clicked,this, &StudentDialog::editProfile);
+    connect(m_ui->exitButton            , &QPushButton::clicked,this, &StudentDialog::exit);
     connect(m_ui->addNewMemberButton    , &QPushButton::clicked,this, &StudentDialog::addNewMember);
     connect(m_ui->deleteMemberButton    , &QPushButton::clicked,this, &StudentDialog::deleteMember);
     connect(m_ui->deleteCollectiveButton, &QPushButton::clicked,this, &StudentDialog::deleteCollective);
+    connect(m_ui->createCollectiveButton, &QPushButton::clicked,this, &StudentDialog::createCollective);
+    connect(m_ui->enterCollectiveButton , &QPushButton::clicked,this, &StudentDialog::enterCollective);
 
     m_settings = new QSettings("connection_config.ini", QSettings::IniFormat, this);
     StudentSignIn S;
@@ -26,6 +28,10 @@ StudentDialog::StudentDialog(QDialog *parent)
         info.group = S.get_group();
         save_StudentInfo(info);
     }
+
+    m_ui->studentNameLabel->setText(info.surname);
+    m_ui->studentGroupLabel->setText(info.group);
+    m_ui->CollectiveName->setText("Коллектив");
     exec();
 }
 
@@ -55,10 +61,41 @@ void StudentDialog::deleteMember()
 
 void StudentDialog::deleteCollective()
 {
+    QMessageBox m;
+    m.setInformativeText("Вы действительно хотите распустить коллектив?");
+    m.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    m.setIcon(QMessageBox::Critical);
+    m.setDefaultButton(QMessageBox::Cancel);
+
+    int res = m.exec();
+    if (res == QMessageBox::Yes)
+    {
+        m_ui->CollectiveName->setText("Вы не состоите в коллективе");
+    }
 
 }
 
 void StudentDialog::exit()
+{
+    QMessageBox m;
+    m.setInformativeText("Вы действительно хотите выйти?");
+    m.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
+    m.setIcon(QMessageBox::Warning);
+    m.setDefaultButton(QMessageBox::Cancel);
+
+    int res = m.exec();
+    if (res == QMessageBox::Yes)
+    {
+
+    }
+}
+
+void StudentDialog::createCollective()
+{
+
+}
+
+void StudentDialog::enterCollective()
 {
 
 }

@@ -7,7 +7,6 @@ StudentSignIn::StudentSignIn(QWidget *parent) :
 {
 
     ui->setupUi(this);
-    //exec();
 }
 
 StudentSignIn::~StudentSignIn()

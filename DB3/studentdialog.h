@@ -7,7 +7,7 @@
 #include "deletememberdialog.h"
 
 #include <QDialog>
-#include <QDialog>
+#include <QMessageBox>
 #include <QSqlDatabase>
 #include <QSqlRecord>
 #include <QSqlQuery>
@@ -48,10 +48,12 @@ private slots:
     void deleteMember();
     void deleteCollective();
     void exit();
+    void createCollective();
+    void enterCollective();
 
 private:
 
-    //void MakeQuery(const QString& a_queryString);
+
 
     QSqlDatabase m_db;
     Ui::StudentDialog* m_ui;
