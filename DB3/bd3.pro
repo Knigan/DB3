@@ -14,8 +14,10 @@ SOURCES += \
     StudentSignIn.cpp \
     TeacherDialog.cpp \
     connection.cpp \
+    createcollectivedialog.cpp \
     deletememberdialog.cpp \
     editprofiledialog.cpp \
+    entercollectivedialog.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -25,8 +27,10 @@ HEADERS += \
     StudentSignIn.h \
     TeacherDialog.h \
     connection.h \
+    createcollectivedialog.h \
     deletememberdialog.h \
     editprofiledialog.h \
+    entercollectivedialog.h \
     mainwindow.h
 
 FORMS += \
@@ -35,8 +39,10 @@ FORMS += \
     StudentSignIn.ui \
     TeacherDialog.ui \
     connection.ui \
+    createcollectivedialog.ui \
     deletememberdialog.ui \
     editprofiledialog.ui \
+    entercollectivedialog.ui \
     mainwindow.ui
 
 # Default rules for deployment.

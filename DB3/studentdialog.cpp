@@ -14,6 +14,8 @@ StudentDialog::StudentDialog(QDialog *parent)
     connect(m_ui->deleteCollectiveButton, &QPushButton::clicked,this, &StudentDialog::deleteCollective);
     connect(m_ui->createCollectiveButton, &QPushButton::clicked,this, &StudentDialog::createCollective);
     connect(m_ui->enterCollectiveButton , &QPushButton::clicked,this, &StudentDialog::enterCollective);
+    connect(m_ui->takeTaskButton        , &QPushButton::clicked,this, &StudentDialog::takeTask);
+    connect(m_ui->takeRandomTaskButton  , &QPushButton::clicked,this, &StudentDialog::takeRandomTask);
 
     m_settings = new QSettings("connection_config.ini", QSettings::IniFormat, this);
     StudentSignIn S;
@@ -92,10 +94,22 @@ void StudentDialog::exit()
 
 void StudentDialog::createCollective()
 {
-
+    createCollectiveDialog d;
+    d.exec();
 }
 
 void StudentDialog::enterCollective()
+{
+     EnterCollectiveDialog d;
+     d.exec();
+}
+
+void StudentDialog::takeTask()
+{
+
+}
+
+void StudentDialog::takeRandomTask()
 {
 
 }

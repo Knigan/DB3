@@ -5,6 +5,8 @@
 #include "AddMemberDialog.h"
 #include "editprofiledialog.h"
 #include "deletememberdialog.h"
+#include "createcollectivedialog.h"
+#include "entercollectivedialog.h"
 
 #include <QDialog>
 #include <QMessageBox>
@@ -32,6 +34,7 @@ struct StudentInfo
     QString group;
 };
 
+
 class StudentDialog : public QDialog
 {
     Q_OBJECT
@@ -50,10 +53,10 @@ private slots:
     void exit();
     void createCollective();
     void enterCollective();
+    void takeTask();
+    void takeRandomTask();
 
 private:
-
-
 
     QSqlDatabase m_db;
     Ui::StudentDialog* m_ui;

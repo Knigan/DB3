@@ -12,6 +12,7 @@ class StudentSignIn : public QDialog
     Q_OBJECT
 
 public:
+
     explicit StudentSignIn(QWidget *parent = nullptr);
     ~StudentSignIn();
     QString get_surname();
@@ -20,6 +21,7 @@ public:
     void set_group(const QString&);
 
 private:
+
     Ui::StudentSignIn *ui;
 };
 
