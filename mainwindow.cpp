@@ -6,9 +6,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-    connectionDialog = new Connection(this);
-
+    Connection(this);
 }
 
 MainWindow::~MainWindow()

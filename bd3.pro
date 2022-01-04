@@ -9,12 +9,10 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    AddMemberDialog.cpp \
     StudentDialog.cpp \
     TeacherDialog.cpp \
     connection.cpp \
     createcollectivedialog.cpp \
-    deletememberdialog.cpp \
     editprofiledialog.cpp \
     entercollectivedialog.cpp \
     main.cpp \
@@ -23,12 +21,10 @@ SOURCES += \
     teachersignin.cpp
 
 HEADERS += \
-    AddMemberDialog.h \
     StudentDialog.h \
     TeacherDialog.h \
     connection.h \
     createcollectivedialog.h \
-    deletememberdialog.h \
     editprofiledialog.h \
     entercollectivedialog.h \
     mainwindow.h \
@@ -36,13 +32,11 @@ HEADERS += \
     teachersignin.h
 
 FORMS += \
-    AddMemberDialog.ui \
     StudentDialog.ui \
     TeacherDialog.ui \
     TeacherSignIn.ui \
     connection.ui \
     createcollectivedialog.ui \
-    deletememberdialog.ui \
     editprofiledialog.ui \
     entercollectivedialog.ui \
     mainwindow.ui \

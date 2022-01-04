@@ -32,14 +32,20 @@
   <widget class="QLabel" name="TitleLabel">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>100</x>
      <y>10</y>
-     <width>381</width>
+     <width>201</width>
      <height>31</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="text">
-    <string>                                         Изменить логин/пароль</string>
+    <string>Изменить логин/пароль</string>
    </property>
    <property name="textFormat">
     <enum>Qt::AutoText</enum>
@@ -60,9 +66,14 @@
     <rect>
      <x>10</x>
      <y>50</y>
-     <width>121</width>
+     <width>141</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Введите новый логин</string>
@@ -73,9 +84,14 @@
     <rect>
      <x>10</x>
      <y>150</y>
-     <width>131</width>
+     <width>171</width>
      <height>16</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Введите новый пароль</string>

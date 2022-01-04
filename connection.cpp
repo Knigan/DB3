@@ -112,7 +112,5 @@ void Connection::accept() {
                 TeacherDialog(this);
             }
         }
-
-    save_ConnectionInfo(info);
-
+    Connection();
 }

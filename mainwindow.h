@@ -18,6 +18,5 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QDialog* connectionDialog;
 };
 #endif // MAINWINDOW_H

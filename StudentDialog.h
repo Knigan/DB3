@@ -2,9 +2,7 @@
 #define STUDENTDIALOG_H
 
 #include "signin.h"
-#include "AddMemberDialog.h"
 #include "editprofiledialog.h"
-#include "deletememberdialog.h"
 #include "createcollectivedialog.h"
 #include "entercollectivedialog.h"
 
@@ -35,6 +33,21 @@ struct StudentInfo
 {
     QString login;
     QString password;
+    int id;
+    int teamId;
+    QString name;
+    QString surname;
+    QString group;
+
+    StudentInfo():
+        login(""),
+        password(""),
+        id(0),
+        teamId(0),
+        name(""),
+        surname(""),
+        group("")
+    {}
 };
 
 

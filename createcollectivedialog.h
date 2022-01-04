@@ -14,6 +14,7 @@ class CreateCollectiveDialog : public QDialog
 public:
     explicit CreateCollectiveDialog(QWidget *parent = nullptr);
     ~CreateCollectiveDialog();
+    QString getName();
 
 private:
     Ui::CreateCollectiveDialog *ui;
