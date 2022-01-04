@@ -25,6 +25,32 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     S.set_login(m_info.login);
     S.set_password(m_info.password);
 
+    connect(m_ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [=](int index){
+        if (index == 0)
+        {
+            qDebug() << "0";
+            QSqlQueryModel* querymodel = makeQuery("select name from labs;");
+            m_ui->listView->setModel(querymodel);
+        }
+        else
+        {
+            qDebug() << "1";
+            QString str;
+            QSqlQueryModel* querymodel = makeQuery("SELECT name FROM labs WHERE id = (SELECT laba FROM teams_and_labs WHERE team = " + str.setNum(m_info.teamId) + ");");
+            m_ui->listView->setModel(querymodel);
+        }
+    });
+
+    connect(m_ui->listView, &QListView::clicked  ,
+    [this](const QModelIndex& index)
+    {
+        qDebug() << "2";
+        m_ui->plainTextEdit->clear();
+        QSqlQueryModel* querymodel = makeQuery("select task from labs where name = '" + index.data().toString() + "';");
+        m_ui->plainTextEdit->appendPlainText(querymodel->data(querymodel->index(0,0)).toString());
+    });
+
     if (S.exec() == QDialog::Accepted)
     {
         m_info.login = S.get_login();
@@ -47,11 +73,29 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     }
 }
 
+QWidget* StudentDialog::createAcceptButtonWidget()
+{
+    QPushButton* b = new QPushButton("Accept");
+    connect(b, &QPushButton::clicked, this, &StudentDialog::acceptEntering);
+    return b;
+}
+
+QWidget* StudentDialog::createDeclineButtonWidget()
+{
+    QPushButton* b = new QPushButton("Decline");
+    connect(b, &QPushButton::clicked, this, &StudentDialog::declineEntering);
+    return b;
+}
+
 void StudentDialog::acceptEntering()
 {
 
 }
 
+void StudentDialog::declineEntering()
+{
+
+}
 
 StudentDialog::~StudentDialog()
 {
@@ -171,6 +215,22 @@ void StudentDialog::refresh() {
 
     querymodel = makeQuery("select name, surname, grp from students where team_id = " + str.setNum(m_info.teamId) + ";");
     m_ui->CollectiveTableView->setModel(querymodel);
+
+    querymodel = makeQuery("select name from labs;");
+    m_ui->listView->setModel(querymodel);
+
+
+    querymodel = makeQuery("select name, surname, grp, id from students where id = (select student_id from requests where team_id = " + str.setNum(m_info.teamId) + ");");
+    querymodel->setHeaderData(2, Qt::Horizontal, "Принять");
+    querymodel->setHeaderData(3, Qt::Horizontal, "Отклонить");
+    m_ui->statementTableView->setModel(querymodel);
+
+    for (int i = 0; i < querymodel->rowCount(); ++i)
+    {
+        m_ui->statementTableView->setIndexWidget(m_ui->statementTableView->model()->index(i,2), createAcceptButtonWidget());
+        m_ui->statementTableView->setIndexWidget(m_ui->statementTableView->model()->index(i,3), createDeclineButtonWidget());
+    }
+
 }
 
 QSqlQueryModel* StudentDialog::makeQuery(const QString& queryString)

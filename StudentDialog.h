@@ -70,6 +70,7 @@ private slots:
     void takeTask();
     void takeRandomTask();
     void acceptEntering();
+    void declineEntering();
 
 private:
 
@@ -81,7 +82,8 @@ private:
     void save_StudentInfo(const StudentInfo&);
     void load_StudentInfo(StudentInfo&);
 
-    QWidget* createButtonWidget();
+    QWidget* createAcceptButtonWidget();
+    QWidget* createDeclineButtonWidget();
     QSqlQueryModel* makeQuery(const QString& queryString);
     void refresh();
 
