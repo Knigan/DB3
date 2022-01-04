@@ -12,7 +12,7 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
 
     connect(m_ui->editProfileButton     , &QPushButton::clicked,this, &StudentDialog::editProfile);
     connect(m_ui->exitButton            , &QPushButton::clicked,this, &StudentDialog::exit);
-    connect(m_ui->deleteCollectiveButton, &QPushButton::clicked,this, &StudentDialog::deleteCollective);
+    connect(m_ui->leaveCollectiveButton, &QPushButton::clicked,this, &StudentDialog::leaveCollective);
     connect(m_ui->createCollectiveButton, &QPushButton::clicked,this, &StudentDialog::createCollective);
     connect(m_ui->enterCollectiveButton , &QPushButton::clicked,this, &StudentDialog::enterCollective);
     connect(m_ui->takeTaskButton        , &QPushButton::clicked,this, &StudentDialog::takeTask);
@@ -42,19 +42,10 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
         m_ui->studentNameLabel->setText(m_info.name);
         m_ui->studentGroupLabel->setText(m_info.group);
 
-        QString str;
-        querymodel = makeQuery("select name from teams where id = " + str.setNum(m_info.teamId) + ";");
-        m_ui->CollectiveName->setText(querymodel->data(querymodel->index(0,0)).toString());
-
-        querymodel = makeQuery("select surname, name, grp, team_id from students where login = '" + m_info.login + "' and password = '" + m_info.password + "';");
-        querymodel = makeQuery("select name, surname, grp from students where team_id = " + str.setNum(m_info.teamId) + ";");
-        m_ui->CollectiveTableView->setModel(querymodel);
-
+        refresh();
         exec();
     }
 }
-
-
 
 void StudentDialog::acceptEntering()
 {
@@ -74,45 +65,51 @@ void StudentDialog::editProfile()
         StudentInfo newInfo;
         newInfo.login = d.getNewLogin();
         newInfo.password = d.getNewPassword();
-        QSqlQuery query(*m_db);
-        query.prepare("UPDATE students SET login = :newlogin, password = :newpassword WHERE login = :oldlogin AND password = :oldpassword");
-        query.bindValue(":newlogin", newInfo.login);
-        query.bindValue(":newpassword", newInfo.password);
-        query.bindValue(":oldlogin", m_info.login);
-        query.bindValue(":oldpassword", m_info.password);
-        query.exec();
+        QSqlQuery* query = new QSqlQuery(*m_db);
+        query->prepare("UPDATE students SET login = :newlogin, password = :newpassword WHERE login = :oldlogin AND password = :oldpassword");
+        query->bindValue(":newlogin", newInfo.login);
+        query->bindValue(":newpassword", newInfo.password);
+        query->bindValue(":oldlogin", m_info.login);
+        query->bindValue(":oldpassword", m_info.password);
+        query->exec();
         m_info.login = newInfo.login;
         m_info.password = newInfo.password;
         save_StudentInfo(m_info);
     }
 }
 
-void StudentDialog::addNewMember()
-{
-    //AddMemberDialog d;
-    //d.exec();
-}
-
-void StudentDialog::deleteMember()
-{
-    //deleteMemberDialog d(this);
-    //d.exec();
-}
-
-void StudentDialog::deleteCollective()
+void StudentDialog::leaveCollective()
 {
     QMessageBox m;
-    m.setInformativeText("Вы действительно хотите распустить коллектив?");
+    m.setInformativeText("Вы действительно хотите выйти из коллектива?");
     m.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-    m.setIcon(QMessageBox::Critical);
+    m.setIcon(QMessageBox::Warning);
     m.setDefaultButton(QMessageBox::Cancel);
 
-    int res = m.exec();
-    if (res == QMessageBox::Yes)
+    if (m.exec() == QMessageBox::Yes)
     {
-        m_ui->CollectiveName->setText("Вы не состоите в коллективе");
-    }
+        QSqlQuery* query = new QSqlQuery(*m_db);
+        QString str;
+        QSqlQueryModel* querymodel = makeQuery("select count_of_students from teams where id = " + str.setNum(m_info.teamId) + ";");
+        int count = querymodel->data(querymodel->index(0,0)).toInt();
+        query->prepare("UPDATE teams SET count_of_students = :count WHERE id = :id;");
+        query->bindValue(":count", count - 1);
+        query->bindValue(":id", m_info.teamId);
+        query->exec();
 
+        query->prepare("UPDATE students SET team_id = 0 WHERE id = :id;");
+        query->bindValue(":id", m_info.id);
+        query->exec();
+        m_info.teamId = 0;
+
+        querymodel = makeQuery("select count_of_students from teams where id = 0;");
+        count = querymodel->data(querymodel->index(0,0)).toInt();
+        query->prepare("UPDATE teams SET count_of_students = :count WHERE id = 0;");
+        query->bindValue(":count", count + 1);
+        query->exec();
+
+        refresh();
+    }
 }
 
 void StudentDialog::exit()
@@ -123,8 +120,7 @@ void StudentDialog::exit()
     m.setIcon(QMessageBox::Warning);
     m.setDefaultButton(QMessageBox::Cancel);
 
-    int res = m.exec();
-    if (res == QMessageBox::Yes)
+    if (m.exec() == QMessageBox::Yes)
         this->close();
 }
 
@@ -133,16 +129,27 @@ void StudentDialog::createCollective()
     CreateCollectiveDialog d;
     if (d.exec() == QDialog::Accepted) {
         if (m_info.teamId == 0) {
-            QSqlQuery query;
-            query.prepare("INSERT INTO teams(id, name, count_of_students) VALUES (DEFAULT, :name, 1);");
-            query.bindValue(":name", d.getName());
-            query.exec();
-            QSqlQueryModel* querymodel = makeQuery("select id from teams where name = '" + d.getName() + "';");
+            QSqlQuery* query = new QSqlQuery(*m_db);
+
+            QSqlQueryModel* querymodel = makeQuery("select count_of_students from teams where id = 0;");
+            int count = querymodel->data(querymodel->index(0,0)).toInt();
+            query->prepare("UPDATE teams SET count_of_students = :count WHERE id = 0;");
+            query->bindValue(":count", count - 1);
+            query->exec();
+
+            QString str = d.getName();
+            query->prepare("INSERT INTO teams(id, name, count_of_students) VALUES (DEFAULT, :name, 1);");
+            query->bindValue(":name", str);
+            query->exec();
+
+            querymodel = makeQuery("select id from teams where name = '" + str + "';");
             m_info.teamId = querymodel->data(querymodel->index(0,0)).toInt();
-            query.prepare("UPDATE students SET team_id = :teamId WHERE id = ':id';");
-            query.bindValue(":teamId", m_info.teamId);
-            query.bindValue(":id", m_info.id);
-            query.exec();
+            query->prepare("UPDATE students SET team_id = :teamId WHERE id = :id;");
+            query->bindValue(":teamId", m_info.teamId);
+            query->bindValue(":id", m_info.id);
+            query->exec();
+
+            refresh();
         }
         else {
             QMessageBox m;
@@ -152,6 +159,18 @@ void StudentDialog::createCollective()
             m.exec();
         }
     }
+}
+
+void StudentDialog::refresh() {
+    QString str;
+    QSqlQueryModel* querymodel = makeQuery("select name from teams where id = " + str.setNum(m_info.teamId) + ";");
+    m_ui->CollectiveName->setText(querymodel->data(querymodel->index(0,0)).toString());
+
+    querymodel = makeQuery("select count_of_students from teams where id = " + str.setNum(m_info.teamId) + ";");
+    m_ui->CollectiveNumber->setText(querymodel->data(querymodel->index(0,0)).toString());
+
+    querymodel = makeQuery("select name, surname, grp from students where team_id = " + str.setNum(m_info.teamId) + ";");
+    m_ui->CollectiveTableView->setModel(querymodel);
 }
 
 QSqlQueryModel* StudentDialog::makeQuery(const QString& queryString)
@@ -167,11 +186,12 @@ QSqlQueryModel* StudentDialog::makeQuery(const QString& queryString)
 
 void StudentDialog::enterCollective()
 {
-     /*EnterCollectiveDialog d;
+     EnterCollectiveDialog d;
      if (d.exec() == QDialog::Accepted)
      {
-         qDebug() << "loh";
-     }*/
+
+     }
+
 }
 
 void StudentDialog::takeTask()

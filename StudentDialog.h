@@ -63,9 +63,7 @@ public:
 private slots:
 
     void editProfile();
-    void addNewMember();
-    void deleteMember();
-    void deleteCollective();
+    void leaveCollective();
     void exit();
     void createCollective();
     void enterCollective();
@@ -85,7 +83,7 @@ private:
 
     QWidget* createButtonWidget();
     QSqlQueryModel* makeQuery(const QString& queryString);
-
+    void refresh();
 
 };
 
