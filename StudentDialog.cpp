@@ -12,7 +12,7 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
 
     connect(m_ui->editProfileButton     , &QPushButton::clicked,this, &StudentDialog::editProfile);
     connect(m_ui->exitButton            , &QPushButton::clicked,this, &StudentDialog::exit);
-    connect(m_ui->leaveCollectiveButton, &QPushButton::clicked,this, &StudentDialog::leaveCollective);
+    connect(m_ui->leaveCollectiveButton , &QPushButton::clicked,this, &StudentDialog::leaveCollective);
     connect(m_ui->createCollectiveButton, &QPushButton::clicked,this, &StudentDialog::createCollective);
     connect(m_ui->enterCollectiveButton , &QPushButton::clicked,this, &StudentDialog::enterCollective);
     connect(m_ui->takeRandomTaskButton  , &QPushButton::clicked,this, &StudentDialog::takeRandomTask);
@@ -77,23 +77,47 @@ QWidget* StudentDialog::createDeclineButtonWidget()
     return b;
 }
 
-void StudentDialog::acceptEntering() {
-    QSqlQuery* query = new QSqlQuery(*m_db);
-    QSqlQueryModel* querymodel = makeQuery("select count_for from requests where id = 0;");
-    int count = querymodel->data(querymodel->index(0,0)).toInt();
-    query->prepare("UPDATE requests SET count_for = :count WHERE id = 0;");
-    query->bindValue(":count", count + 1);
-    query->exec();
+void StudentDialog::acceptEntering()
+{
+    if (QPushButton* btn = qobject_cast<QPushButton*>(sender()))
+    {
+        QModelIndex index = m_ui->statementTableView->indexAt(btn->parentWidget()->pos());
+        QString name = m_ui->statementTableView->model()->data(m_ui->statementTableView->model()->index(index.row(), 0)).toString();
+
+
+        QSqlQuery* query = new QSqlQuery(*m_db);
+        QSqlQueryModel* querymodel = makeQuery("select count_for from requests where student_id = (select id from students where name = '" + name + "');");
+        int count = querymodel->data(querymodel->index(0,0)).toInt();
+        query->prepare("UPDATE requests SET count_for = :count WHERE student_id = (select id from students where name = '" + name + "');");
+        query->bindValue(":count", count + 1);
+        query->exec();
+
+        btn->setEnabled(false);
+        btn->setText("Clicked");
+        QWidget* anotherBtn = m_ui->statementTableView->indexWidget(m_ui->statementTableView->model()->index(index.row(), 3));
+        anotherBtn->setEnabled(false);
+    }
 }
 
 void StudentDialog::declineEntering()
 {
-    QSqlQuery* query = new QSqlQuery(*m_db);
-    QSqlQueryModel* querymodel = makeQuery("select count_against from requests where id = 0;");
-    int count = querymodel->data(querymodel->index(0,0)).toInt();
-    query->prepare("UPDATE requests SET count_against = :count WHERE id = 0;");
-    query->bindValue(":count", count + 1);
-    query->exec();
+    if (QPushButton* btn = qobject_cast<QPushButton*>(sender()))
+    {
+        QModelIndex index = m_ui->statementTableView->indexAt(btn->parentWidget()->pos());
+        QString name = m_ui->statementTableView->model()->data(m_ui->statementTableView->model()->index(index.row(), 0)).toString();
+
+        QSqlQuery* query = new QSqlQuery(*m_db);
+        QSqlQueryModel* querymodel = makeQuery("select count_against from requests where student_id = (select id from students where name = '" + name + "');");
+        int count = querymodel->data(querymodel->index(0,0)).toInt();
+        query->prepare("UPDATE requests SET count_against = :count WHERE student_id = (select id from students where name = '" + name + "');");
+        query->bindValue(":count", count + 1);
+        query->exec();
+
+        btn->setEnabled(false);
+        btn->setText("Clicked");
+        QWidget* anotherBtn = m_ui->statementTableView->indexWidget(m_ui->statementTableView->model()->index(index.row(), 2));
+        anotherBtn->setEnabled(false);
+    }
 }
 
 StudentDialog::~StudentDialog()
@@ -262,7 +286,7 @@ void StudentDialog::enterCollective()
          if (m_info.teamId == 0)
          {
             QSqlQuery* query = new QSqlQuery(*m_db);
-            query->prepare("INSERT INTO requests(student_id, team_id, count_for, count_against) VALUES (:student_id, :team_id, 0, 0);");
+            query->prepare("INSERT INTO requests(student_id, team_id, count_for, count_against) VALUES (:student_id, (select id from teams where name = :team_id), 0, 0);");
             query->bindValue(":student_id", m_info.id);
             query->bindValue(":team_id", d.getName());
             query->exec();

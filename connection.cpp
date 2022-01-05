@@ -109,7 +109,7 @@ void Connection::accept() {
                 StudentDialog(this, &DB);
             }
             else {
-                TeacherDialog(this);
+                TeacherDialog(this, &DB);
             }
             Connection();
         }

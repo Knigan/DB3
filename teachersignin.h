@@ -17,6 +17,10 @@ public:
 
 private:
     Ui::TeacherSignIn *ui;
+    QString get_login();
+    QString get_password();
+    void set_login(const QString& S);
+    void set_password(const QString& G);
 };
 
 #endif // TEACHERSIGNIN_H
