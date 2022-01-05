@@ -12,3 +12,7 @@ EnterCollectiveDialog::~EnterCollectiveDialog()
 {
     delete ui;
 }
+
+QString EnterCollectiveDialog::getName() {
+    return ui->NameLineEdit->text();
+}

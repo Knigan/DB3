@@ -77,14 +77,23 @@ QWidget* StudentDialog::createDeclineButtonWidget()
     return b;
 }
 
-void StudentDialog::acceptEntering()
-{
-
+void StudentDialog::acceptEntering() {
+    QSqlQuery* query = new QSqlQuery(*m_db);
+    QSqlQueryModel* querymodel = makeQuery("select count_for from requests where id = 0;");
+    int count = querymodel->data(querymodel->index(0,0)).toInt();
+    query->prepare("UPDATE requests SET count_for = :count WHERE id = 0;");
+    query->bindValue(":count", count + 1);
+    query->exec();
 }
 
 void StudentDialog::declineEntering()
 {
-
+    QSqlQuery* query = new QSqlQuery(*m_db);
+    QSqlQueryModel* querymodel = makeQuery("select count_against from requests where id = 0;");
+    int count = querymodel->data(querymodel->index(0,0)).toInt();
+    query->prepare("UPDATE requests SET count_against = :count WHERE id = 0;");
+    query->bindValue(":count", count + 1);
+    query->exec();
 }
 
 StudentDialog::~StudentDialog()
@@ -231,7 +240,6 @@ void StudentDialog::refreshLabs()
 {
     QSqlQueryModel* querymodel = makeQuery("select name from labs;");
     m_ui->listView->setModel(querymodel);
-
 }
 
 
@@ -253,8 +261,11 @@ void StudentDialog::enterCollective()
      {
          if (m_info.teamId == 0)
          {
-            QString str;
-            QSqlQueryModel* querymodel = makeQuery("insert into requests (student_id, team_id) values(" + str.setNum(m_info.id) + ", " + ");");
+            QSqlQuery* query = new QSqlQuery(*m_db);
+            query->prepare("INSERT INTO requests(student_id, team_id, count_for, count_against) VALUES (:student_id, :team_id, 0, 0);");
+            query->bindValue(":student_id", m_info.id);
+            query->bindValue(":team_id", d.getName());
+            query->exec();
          }
          else
          {

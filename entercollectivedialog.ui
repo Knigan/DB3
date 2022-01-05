@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label">
+  <widget class="QLabel" name="TitleLabel">
    <property name="geometry">
     <rect>
      <x>110</x>
@@ -48,7 +48,7 @@
     <string>Вступление в коллектив</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="NameLineEdit">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -58,7 +58,7 @@
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="label_2">
+  <widget class="QLabel" name="NameLabel">
    <property name="geometry">
     <rect>
      <x>10</x>
