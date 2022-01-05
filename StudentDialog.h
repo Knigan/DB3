@@ -60,6 +60,7 @@ public:
     StudentDialog(QDialog *parent = nullptr, QSqlDatabase* p = nullptr);
     ~StudentDialog();
 
+
 private slots:
 
     void editProfile();
@@ -67,7 +68,6 @@ private slots:
     void exit();
     void createCollective();
     void enterCollective();
-    void takeTask();
     void takeRandomTask();
     void acceptEntering();
     void declineEntering();
@@ -79,13 +79,18 @@ private:
     QSettings* m_settings;
     StudentInfo m_info;
 
+    bool isOk(int num);
+
     void save_StudentInfo(const StudentInfo&);
     void load_StudentInfo(StudentInfo&);
 
     QWidget* createAcceptButtonWidget();
     QWidget* createDeclineButtonWidget();
+
     QSqlQueryModel* makeQuery(const QString& queryString);
-    void refresh();
+    void refreshCollectiveInfo();
+    void refreshRequests();
+    void refreshLabs();
 
 };
 

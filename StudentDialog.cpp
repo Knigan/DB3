@@ -3,6 +3,7 @@
 #include <QDialogButtonBox>
 #include <QSqlTableModel>
 
+
 StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     : QDialog(parent)
     , m_db(p)
@@ -12,10 +13,10 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
 
     connect(m_ui->editProfileButton     , &QPushButton::clicked,this, &StudentDialog::editProfile);
     connect(m_ui->exitButton            , &QPushButton::clicked,this, &StudentDialog::exit);
-    connect(m_ui->leaveCollectiveButton, &QPushButton::clicked,this, &StudentDialog::leaveCollective);
+    connect(m_ui->leaveCollectiveButton , &QPushButton::clicked,this, &StudentDialog::leaveCollective);
     connect(m_ui->createCollectiveButton, &QPushButton::clicked,this, &StudentDialog::createCollective);
     connect(m_ui->enterCollectiveButton , &QPushButton::clicked,this, &StudentDialog::enterCollective);
-    connect(m_ui->takeTaskButton        , &QPushButton::clicked,this, &StudentDialog::takeTask);
+    //connect(m_ui->takeTaskButton        , &QPushButton::clicked,this, &StudentDialog::takeTask);
     connect(m_ui->takeRandomTaskButton  , &QPushButton::clicked,this, &StudentDialog::takeRandomTask);
 
     m_settings = new QSettings("signin_config.ini", QSettings::IniFormat, this);
@@ -29,23 +30,20 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     [=](int index){
         if (index == 0)
         {
-            qDebug() << "0";
             QSqlQueryModel* querymodel = makeQuery("select name from labs;");
             m_ui->listView->setModel(querymodel);
         }
         else
         {
-            qDebug() << "1";
             QString str;
-            QSqlQueryModel* querymodel = makeQuery("SELECT name FROM labs WHERE id = (SELECT laba FROM teams_and_labs WHERE team = " + str.setNum(m_info.teamId) + ");");
+            QSqlQueryModel* querymodel = makeQuery("select name from labs join teams_and_labs on teams_and_labs.laba = labs.id where teams_and_labs.team = " + str.setNum(m_info.teamId) + ";");
             m_ui->listView->setModel(querymodel);
         }
     });
 
-    connect(m_ui->listView, &QListView::clicked  ,
+    connect(m_ui->listView, &QListView::clicked,
     [this](const QModelIndex& index)
     {
-        qDebug() << "2";
         m_ui->plainTextEdit->clear();
         QSqlQueryModel* querymodel = makeQuery("select task from labs where name = '" + index.data().toString() + "';");
         m_ui->plainTextEdit->appendPlainText(querymodel->data(querymodel->index(0,0)).toString());
@@ -61,14 +59,17 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
         m_info.name    = querymodel->data(querymodel->index(0,1)).toString();
         m_info.group   = querymodel->data(querymodel->index(0,2)).toString();
         m_info.teamId  = querymodel->data(querymodel->index(0,3)).toInt();
-        m_info.id = querymodel->data(querymodel->index(0,4)).toInt();
+        m_info.id      = querymodel->data(querymodel->index(0,4)).toInt();
 
 
         m_ui->studentSurnameLabel->setText(m_info.surname);
         m_ui->studentNameLabel->setText(m_info.name);
         m_ui->studentGroupLabel->setText(m_info.group);
 
-        refresh();
+        refreshCollectiveInfo();
+        refreshRequests();
+        refreshLabs();
+
         exec();
     }
 }
@@ -152,7 +153,9 @@ void StudentDialog::leaveCollective()
         query->bindValue(":count", count + 1);
         query->exec();
 
-        refresh();
+        refreshCollectiveInfo();
+        refreshRequests();
+        refreshLabs();
     }
 }
 
@@ -193,7 +196,9 @@ void StudentDialog::createCollective()
             query->bindValue(":id", m_info.id);
             query->exec();
 
-            refresh();
+            refreshCollectiveInfo();
+            refreshRequests();
+            refreshLabs();
         }
         else {
             QMessageBox m;
@@ -205,7 +210,8 @@ void StudentDialog::createCollective()
     }
 }
 
-void StudentDialog::refresh() {
+void StudentDialog::refreshCollectiveInfo()
+{
     QString str;
     QSqlQueryModel* querymodel = makeQuery("select name from teams where id = " + str.setNum(m_info.teamId) + ";");
     m_ui->CollectiveName->setText(querymodel->data(querymodel->index(0,0)).toString());
@@ -215,12 +221,12 @@ void StudentDialog::refresh() {
 
     querymodel = makeQuery("select name, surname, grp from students where team_id = " + str.setNum(m_info.teamId) + ";");
     m_ui->CollectiveTableView->setModel(querymodel);
+}
 
-    querymodel = makeQuery("select name from labs;");
-    m_ui->listView->setModel(querymodel);
-
-
-    querymodel = makeQuery("select name, surname, grp, id from students where id = (select student_id from requests where team_id = " + str.setNum(m_info.teamId) + ");");
+void StudentDialog::refreshRequests()
+{
+    QString str;
+    QSqlQueryModel* querymodel = makeQuery("select name, surname, grp, id from students where id = (select student_id from requests where team_id = " + str.setNum(m_info.teamId) + ");");
     querymodel->setHeaderData(2, Qt::Horizontal, "Принять");
     querymodel->setHeaderData(3, Qt::Horizontal, "Отклонить");
     m_ui->statementTableView->setModel(querymodel);
@@ -230,8 +236,15 @@ void StudentDialog::refresh() {
         m_ui->statementTableView->setIndexWidget(m_ui->statementTableView->model()->index(i,2), createAcceptButtonWidget());
         m_ui->statementTableView->setIndexWidget(m_ui->statementTableView->model()->index(i,3), createDeclineButtonWidget());
     }
+}
+
+void StudentDialog::refreshLabs()
+{
+    QSqlQueryModel* querymodel = makeQuery("select name from labs;");
+    m_ui->listView->setModel(querymodel);
 
 }
+
 
 QSqlQueryModel* StudentDialog::makeQuery(const QString& queryString)
 {
@@ -249,26 +262,68 @@ void StudentDialog::enterCollective()
      EnterCollectiveDialog d;
      if (d.exec() == QDialog::Accepted)
      {
-
+         if (m_info.teamId == 0)
+         {
+            QString str;
+            QSqlQueryModel* querymodel = makeQuery("insert into requests (student_id, team_id) values(" + str.setNum(m_info.id) + ", " + ");");
+         }
+         else
+         {
+             QMessageBox m;
+             m.setInformativeText("Вы уже состоите в коллективе!");
+             m.setIcon(QMessageBox::Critical);
+             m.setDefaultButton(QMessageBox::Ok);
+             m.exec();
+         }
      }
-
-}
-
-void StudentDialog::takeTask()
-{
-
 }
 
 void StudentDialog::takeRandomTask()
 {
+    srand(time(nullptr));
+    QString str, temp;
+    QSqlQueryModel* querymodel = makeQuery("select * from labs");
 
+    int randNum = rand() % querymodel->rowCount();
+    qDebug() << randNum << " first" ;
+    bool flag = true;
+
+    while (flag)
+    {
+        if (isOk(randNum))
+        {
+            flag = false;
+        }
+        else
+        {
+            randNum = rand() % querymodel->rowCount();
+        }
+    }
+    qDebug() << randNum << " - result";
+    makeQuery("insert into teams_and_labs(team, laba) values (" + str.setNum(m_info.teamId) + ", " + temp.setNum(randNum) + ");");
+    refreshLabs();
+}
+
+bool StudentDialog::isOk(int num)
+{
+    QString str;
+    QSqlQueryModel* query = makeQuery("select laba from teams_and_labs where team = " + str.setNum(m_info.teamId));
+
+    for(int i = 0; i < query->rowCount(); ++i)
+    {
+        if (num == query->data(query->index(i, 0)).toInt() || num == 0)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 
 void StudentDialog::save_StudentInfo(const StudentInfo& info)
 {
     m_settings->setValue("Login", info.login);
-    m_settings->setValue("Password"  , info.password);
+    m_settings->setValue("Password", info.password);
 }
 
 void StudentDialog::load_StudentInfo(StudentInfo& info)
