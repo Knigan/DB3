@@ -26,18 +26,17 @@ void SignUp::signup()
     query->bindValue(":grp", ui->GroupLineEdit->text());
     query->bindValue(":login", ui->LoginLineEdit->text());
     query->bindValue(":password", ui->PasswordLineEdit->text());
-    qDebug() << ui->SurnameLineEdit->text();
     query->exec();
 
     QSqlQueryModel *querymodel = new QSqlQueryModel;
-    if (query->exec("select count_of_students from teams where id = 0;"))
+    if (query->exec("SELECT COUNT(*) FROM students WHERE team_id = 0;"))
     {
         querymodel->setQuery(*query);
     }
-
     int count = querymodel->data(querymodel->index(0,0)).toInt();
     query->prepare("UPDATE teams SET count_of_students = :count WHERE id = 0;");
-    query->bindValue(":count", count + 1);
+    query->bindValue(":count", count);
     query->exec();
+
     this->close();
 }

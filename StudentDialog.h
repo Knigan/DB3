@@ -65,6 +65,7 @@ private slots:
     void editProfile();
     void leaveCollective();
     void exit();
+    void refresh();
     void createCollective();
     void enterCollective();
     void takeRandomTask();
@@ -89,6 +90,7 @@ private:
     void refreshCollectiveInfo();
     void refreshRequests();
     void refreshLabs();
+    void refreshCount(int team_id = 0);
 
 };
 
