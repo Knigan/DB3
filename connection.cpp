@@ -111,6 +111,6 @@ void Connection::accept() {
             else {
                 TeacherDialog(this);
             }
+            Connection();
         }
-    Connection();
 }

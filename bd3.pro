@@ -18,6 +18,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     signin.cpp \
+    signup.cpp \
     teachersignin.cpp
 
 HEADERS += \
@@ -29,6 +30,7 @@ HEADERS += \
     entercollectivedialog.h \
     mainwindow.h \
     signin.h \
+    signup.h \
     teachersignin.h
 
 FORMS += \
@@ -40,7 +42,8 @@ FORMS += \
     editprofiledialog.ui \
     entercollectivedialog.ui \
     mainwindow.ui \
-    signin.ui
+    signin.ui \
+    signup.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

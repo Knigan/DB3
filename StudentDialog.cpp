@@ -3,7 +3,6 @@
 #include <QDialogButtonBox>
 #include <QSqlTableModel>
 
-
 StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     : QDialog(parent)
     , m_db(p)
@@ -13,18 +12,14 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
 
     connect(m_ui->editProfileButton     , &QPushButton::clicked,this, &StudentDialog::editProfile);
     connect(m_ui->exitButton            , &QPushButton::clicked,this, &StudentDialog::exit);
-    connect(m_ui->leaveCollectiveButton , &QPushButton::clicked,this, &StudentDialog::leaveCollective);
+    connect(m_ui->leaveCollectiveButton, &QPushButton::clicked,this, &StudentDialog::leaveCollective);
     connect(m_ui->createCollectiveButton, &QPushButton::clicked,this, &StudentDialog::createCollective);
     connect(m_ui->enterCollectiveButton , &QPushButton::clicked,this, &StudentDialog::enterCollective);
-    //connect(m_ui->takeTaskButton        , &QPushButton::clicked,this, &StudentDialog::takeTask);
     connect(m_ui->takeRandomTaskButton  , &QPushButton::clicked,this, &StudentDialog::takeRandomTask);
 
     m_settings = new QSettings("signin_config.ini", QSettings::IniFormat, this);
-    SignIn S;
-
+    SignIn S(nullptr, m_settings, m_db);
     load_StudentInfo(m_info);
-    S.set_login(m_info.login);
-    S.set_password(m_info.password);
 
     connect(m_ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
     [=](int index){
@@ -41,7 +36,7 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
         }
     });
 
-    connect(m_ui->listView, &QListView::clicked,
+    connect(m_ui->listView, &QListView::clicked  ,
     [this](const QModelIndex& index)
     {
         m_ui->plainTextEdit->clear();
@@ -49,29 +44,23 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
         m_ui->plainTextEdit->appendPlainText(querymodel->data(querymodel->index(0,0)).toString());
     });
 
-    if (S.exec() == QDialog::Accepted)
-    {
-        m_info.login = S.get_login();
-        m_info.password = S.get_password();
-        save_StudentInfo(m_info);
-        QSqlQueryModel *querymodel = makeQuery("select surname, name, grp, team_id, id from students where login = '" + m_info.login + "' and password = '" + m_info.password + "';");
-        m_info.surname = querymodel->data(querymodel->index(0,0)).toString();
-        m_info.name    = querymodel->data(querymodel->index(0,1)).toString();
-        m_info.group   = querymodel->data(querymodel->index(0,2)).toString();
-        m_info.teamId  = querymodel->data(querymodel->index(0,3)).toInt();
-        m_info.id      = querymodel->data(querymodel->index(0,4)).toInt();
+    QSqlQueryModel *querymodel = makeQuery("select surname, name, grp, team_id, id from students where login = '" + m_info.login + "' and password = '" + m_info.password + "';");
+    m_info.surname = querymodel->data(querymodel->index(0,0)).toString();
+    m_info.name    = querymodel->data(querymodel->index(0,1)).toString();
+    m_info.group   = querymodel->data(querymodel->index(0,2)).toString();
+    m_info.teamId  = querymodel->data(querymodel->index(0,3)).toInt();
+    m_info.id = querymodel->data(querymodel->index(0,4)).toInt();
 
 
-        m_ui->studentSurnameLabel->setText(m_info.surname);
-        m_ui->studentNameLabel->setText(m_info.name);
-        m_ui->studentGroupLabel->setText(m_info.group);
+    m_ui->studentSurnameLabel->setText(m_info.surname);
+    m_ui->studentNameLabel->setText(m_info.name);
+    m_ui->studentGroupLabel->setText(m_info.group);
 
-        refreshCollectiveInfo();
-        refreshRequests();
-        refreshLabs();
+    refreshCollectiveInfo();
+    refreshRequests();
+    refreshLabs();
 
-        exec();
-    }
+    exec();
 }
 
 QWidget* StudentDialog::createAcceptButtonWidget()
@@ -331,3 +320,4 @@ void StudentDialog::load_StudentInfo(StudentInfo& info)
     info.login = m_settings->value("Login").toString();
     info.password = m_settings->value("Password").toString();
 }
+

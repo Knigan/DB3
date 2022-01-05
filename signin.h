@@ -3,6 +3,10 @@
 
 #include <QDialog>
 #include <QSettings>
+#include <QSqlDatabase>
+#include <QSqlQuery>
+#include <QSqlQueryModel>
+#include "signup.h"
 
 namespace Ui {
 class SignIn;
@@ -26,15 +30,16 @@ class SignIn : public QDialog
     Q_OBJECT
 
 public:
-    explicit SignIn(QWidget *parent = nullptr);
+    explicit SignIn(QWidget *parent = nullptr, QSettings* ptr = nullptr, QSqlDatabase* DB = nullptr);
     ~SignIn();
-    QString get_login();
-    QString get_password();
-    void set_login(const QString&);
-    void set_password(const QString&);
 
 private:
     Ui::SignIn *ui;
+    QSettings* sign_in;
+    QSqlDatabase* db;
+    SignInInfo info;
+    void signin();
+    void signup();
 };
 
 #endif // SIGNIN_H

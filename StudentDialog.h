@@ -60,7 +60,6 @@ public:
     StudentDialog(QDialog *parent = nullptr, QSqlDatabase* p = nullptr);
     ~StudentDialog();
 
-
 private slots:
 
     void editProfile();
@@ -79,14 +78,13 @@ private:
     QSettings* m_settings;
     StudentInfo m_info;
 
-    bool isOk(int num);
-
     void save_StudentInfo(const StudentInfo&);
     void load_StudentInfo(StudentInfo&);
 
+    bool isOk(int num);
+
     QWidget* createAcceptButtonWidget();
     QWidget* createDeclineButtonWidget();
-
     QSqlQueryModel* makeQuery(const QString& queryString);
     void refreshCollectiveInfo();
     void refreshRequests();

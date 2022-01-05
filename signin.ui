@@ -6,140 +6,149 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>496</width>
-    <height>373</height>
+    <width>536</width>
+    <height>333</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
+  <widget class="QLabel" name="TitleLabel">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>110</y>
-     <width>341</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="PasswordLineEdit">
-   <property name="geometry">
-    <rect>
-     <x>168</x>
-     <y>83</y>
-     <width>287</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="echoMode">
-    <enum>QLineEdit::Password</enum>
-   </property>
-  </widget>
-  <widget class="QLabel" name="PasswordLabel">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>83</y>
-     <width>122</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Password</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="LoginLineEdit">
-   <property name="geometry">
-    <rect>
-     <x>168</x>
-     <y>50</y>
-     <width>287</width>
-     <height>27</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-  </widget>
-  <widget class="QLabel" name="Title">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>21</y>
-     <width>415</width>
-     <height>23</height>
+     <x>230</x>
+     <y>10</y>
+     <width>61</width>
+     <height>21</height>
     </rect>
    </property>
    <property name="font">
     <font>
-     <family>Times New Roman</family>
-     <pointsize>16</pointsize>
+     <pointsize>12</pointsize>
+     <bold>true</bold>
     </font>
    </property>
    <property name="text">
     <string>Sign in</string>
    </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
   </widget>
   <widget class="QLabel" name="LoginLabel">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>50</y>
-     <width>122</width>
-     <height>27</height>
+     <x>10</x>
+     <y>40</y>
+     <width>41</width>
+     <height>16</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
    </property>
    <property name="text">
     <string>Login</string>
    </property>
   </widget>
+  <widget class="QLineEdit" name="LoginLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>60</y>
+     <width>511</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="PasswordLabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>90</y>
+     <width>61</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Password</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="PasswordLineEdit">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>110</y>
+     <width>511</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="echoMode">
+    <enum>QLineEdit::Password</enum>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="SignInButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>140</y>
+     <width>511</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sign in</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="SignUpButton">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>290</y>
+     <width>80</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Sign up</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="SignUpLabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>270</y>
+     <width>101</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Press to sign up</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="ErrorLabel">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>170</y>
+     <width>511</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+  </widget>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>SignIn</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>SignIn</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
