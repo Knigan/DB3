@@ -83,6 +83,7 @@ private:
     void load_StudentInfo(StudentInfo&);
 
     bool isOk(int num);
+    bool isUniqueCollectiveName(const QString&);
 
     QWidget* createAcceptButtonWidget();
     QWidget* createDeclineButtonWidget();

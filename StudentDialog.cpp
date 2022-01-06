@@ -82,15 +82,17 @@ void StudentDialog::acceptEntering()
 {
     if (QPushButton* btn = qobject_cast<QPushButton*>(sender()))
     {
+        QString str;
         QModelIndex index = m_ui->statementTableView->indexAt(btn->parentWidget()->pos());
-        QString name = m_ui->statementTableView->model()->data(m_ui->statementTableView->model()->index(index.row(), 0)).toString();
+        int id = m_ui->statementTableView->model()->data(m_ui->statementTableView->model()->index(index.row(), 3)).toInt();
 
 
         QSqlQuery* query = new QSqlQuery(*m_db);
-        QSqlQueryModel* querymodel = makeQuery("SELECT count_for FROM counts WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
+        QSqlQueryModel* querymodel = makeQuery("SELECT count_for FROM counts WHERE student_id = " + str.setNum(id) + ";");
         int count = querymodel->data(querymodel->index(0,0)).toInt();
-        query->prepare("UPDATE counts SET count_for = :count WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
+        query->prepare("UPDATE counts SET count_for = :count WHERE student_id = :id;");
         query->bindValue(":count", count + 1);
+        query->bindValue(":id", id);
         query->exec();
 
         btn->setEnabled(false);
@@ -98,8 +100,8 @@ void StudentDialog::acceptEntering()
         QWidget* anotherBtn = m_ui->statementTableView->indexWidget(m_ui->statementTableView->model()->index(index.row(), 3));
         anotherBtn->setEnabled(false);
 
-        query->prepare("DELETE FROM requests WHERE student_id = (SELECT id FROM students WHERE name = :name) AND team_id = :team_id AND student_from_team_id = :student_from_team_id;");
-        query->bindValue(":name", name);
+        query->prepare("DELETE FROM requests WHERE student_id = :id AND team_id = :team_id AND student_from_team_id = :student_from_team_id;");
+        query->bindValue(":id", id);
         query->bindValue(":team_id", m_info.teamId);
         query->bindValue(":student_from_team_id", m_info.id);
         query->exec();
@@ -110,14 +112,16 @@ void StudentDialog::declineEntering()
 {
     if (QPushButton* btn = qobject_cast<QPushButton*>(sender()))
     {
+        QString str;
         QModelIndex index = m_ui->statementTableView->indexAt(btn->parentWidget()->pos());
-        QString name = m_ui->statementTableView->model()->data(m_ui->statementTableView->model()->index(index.row(), 0)).toString();
+        int id = m_ui->statementTableView->model()->data(m_ui->statementTableView->model()->index(index.row(), 3)).toInt();
 
         QSqlQuery* query = new QSqlQuery(*m_db);
-        QSqlQueryModel* querymodel = makeQuery("SELECT count_against FROM counts WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
+        QSqlQueryModel* querymodel = makeQuery("SELECT count_against FROM counts WHERE student_id = " + str.setNum(id) + ";");
         int count = querymodel->data(querymodel->index(0,0)).toInt();
-        query->prepare("UPDATE counts SET count_against = :count WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
+        query->prepare("UPDATE counts SET count_against = :count WHERE student_id = :id;");
         query->bindValue(":count", count + 1);
+        query->bindValue(":id", id);
         query->exec();
 
         btn->setEnabled(false);
@@ -125,8 +129,8 @@ void StudentDialog::declineEntering()
         QWidget* anotherBtn = m_ui->statementTableView->indexWidget(m_ui->statementTableView->model()->index(index.row(), 2));
         anotherBtn->setEnabled(false);
 
-        query->prepare("DELETE FROM requests WHERE student_id = (SELECT id FROM students WHERE name = :name) AND team_id = :team_id AND student_from_team_id = :student_from_team_id;");
-        query->bindValue(":name", name);
+        query->prepare("DELETE FROM requests WHERE student_id = :id AND team_id = :team_id AND student_from_team_id = :student_from_team_id;");
+        query->bindValue(":id", id);
         query->bindValue(":team_id", m_info.teamId);
         query->bindValue(":student_from_team_id", m_info.id);
         query->exec();
@@ -145,16 +149,32 @@ void StudentDialog::editProfile()
         StudentInfo newInfo;
         newInfo.login = d.getNewLogin();
         newInfo.password = d.getNewPassword();
+
         QSqlQuery* query = new QSqlQuery(*m_db);
-        query->prepare("UPDATE students SET login = :newlogin, password = :newpassword WHERE login = :oldlogin AND password = :oldpassword");
-        query->bindValue(":newlogin", newInfo.login);
-        query->bindValue(":newpassword", newInfo.password);
-        query->bindValue(":oldlogin", m_info.login);
-        query->bindValue(":oldpassword", m_info.password);
-        query->exec();
-        m_info.login = newInfo.login;
-        m_info.password = newInfo.password;
-        save_StudentInfo(m_info);
+        QSqlQueryModel* querymodel = new QSqlQueryModel;
+        if (query->exec("SELECT COUNT(*) FROM students WHERE login = '" + newInfo.login + "' AND password = '" + newInfo.password + "';")) {
+            querymodel->setQuery(*query);
+        }
+        int count = querymodel->data(querymodel->index(0,0)).toInt();
+
+        if (count != 0) {
+            QMessageBox m;
+            m.setInformativeText("Эти логин и пароль уже заняты!");
+            m.setIcon(QMessageBox::Critical);
+            m.setDefaultButton(QMessageBox::Ok);
+            m.exec();
+        }
+        else {
+            query->prepare("UPDATE students SET login = :newlogin, password = :newpassword WHERE login = :oldlogin AND password = :oldpassword");
+            query->bindValue(":newlogin", newInfo.login);
+            query->bindValue(":newpassword", newInfo.password);
+            query->bindValue(":oldlogin", m_info.login);
+            query->bindValue(":oldpassword", m_info.password);
+            query->exec();
+            m_info.login = newInfo.login;
+            m_info.password = newInfo.password;
+            save_StudentInfo(m_info);
+        }
     }
 }
 
@@ -177,6 +197,7 @@ void StudentDialog::leaveCollective()
         m_info.teamId = 0;
         refreshCount();
         refreshCollectiveInfo();
+        query->exec("DELETE FROM teams WHERE count_of_students = 0 AND name != 'zeroclub';");
     }
 }
 
@@ -198,26 +219,48 @@ void StudentDialog::refresh() {
     refreshLabs();
 }
 
+bool StudentDialog::isUniqueCollectiveName(const QString& name)
+{
+   QSqlQueryModel* querymodel = makeQuery("SELECT name FROM teams");
+   for (int i = 0; i < querymodel->rowCount(); ++i)
+   {
+       if (name == querymodel->data(querymodel->index(i, 0)))
+       {
+            return false;
+       }
+   }
+   return true;
+}
+
 void StudentDialog::createCollective()
 {
     CreateCollectiveDialog d;
     if (d.exec() == QDialog::Accepted) {
         if (m_info.teamId == 0) {
-            QSqlQuery* query = new QSqlQuery(*m_db);
             QString str = d.getName();
-            query->prepare("INSERT INTO teams(id, name, count_of_students) VALUES (DEFAULT, :name, 1);");
-            query->bindValue(":name", str);
-            query->exec();
+            if (isUniqueCollectiveName(str)) {
+                QSqlQuery* query = new QSqlQuery(*m_db);
+                query->prepare("INSERT INTO teams(id, name, count_of_students) VALUES (DEFAULT, :name, 1);");
+                query->bindValue(":name", str);
+                query->exec();
 
-            QSqlQueryModel* querymodel = makeQuery("SELECT id FROM teams WHERE name = '" + str + "';");
-            m_info.teamId = querymodel->data(querymodel->index(0,0)).toInt();
-            query->prepare("UPDATE students SET team_id = :teamId WHERE id = :id;");
-            query->bindValue(":teamId", m_info.teamId);
-            query->bindValue(":id", m_info.id);
-            query->exec();
+                QSqlQueryModel* querymodel = makeQuery("SELECT id FROM teams WHERE name = '" + str + "';");
+                m_info.teamId = querymodel->data(querymodel->index(0,0)).toInt();
+                query->prepare("UPDATE students SET team_id = :teamId WHERE id = :id;");
+                query->bindValue(":teamId", m_info.teamId);
+                query->bindValue(":id", m_info.id);
+                query->exec();
 
-            refreshCount();
-            refreshCollectiveInfo();
+                refreshCount();
+                refreshCollectiveInfo();
+            }
+            else {
+                QMessageBox m;
+                m.setInformativeText("Это имя уже занято!");
+                m.setIcon(QMessageBox::Critical);
+                m.setDefaultButton(QMessageBox::Ok);
+                m.exec();
+            }
         }
         else {
             QMessageBox m;
@@ -228,6 +271,8 @@ void StudentDialog::createCollective()
         }
     }
 }
+
+
 
 void StudentDialog::refreshCollectiveInfo()
 {
@@ -294,13 +339,17 @@ void StudentDialog::refreshRequests()
     }
 
     QString str;
-    querymodel = makeQuery("SELECT student_id FROM requests WHERE team_id = " + str.setNum(m_info.teamId) + " AND student_from_team_id = " + str.setNum(m_info.id) + ";");
-    int k = querymodel->data(querymodel->index(0,0)).toInt();
     querymodel = makeQuery("SELECT COUNT(*) FROM requests WHERE student_from_team_id = " + str.setNum(m_info.id));
     int count = querymodel->data(querymodel->index(0,0)).toInt();
 
     if (count != 0) {
-        querymodel = makeQuery("SELECT name, surname, grp, id FROM students WHERE id = " + str.setNum(k) + ";");
+        QSqlQuery* query = new QSqlQuery(*m_db);
+        query->prepare("SELECT name, surname, grp, id FROM students WHERE id = (SELECT student_id FROM requests WHERE team_id = :team_id AND student_from_team_id = :id);");
+        query->bindValue(":team_id", m_info.teamId);
+        query->bindValue(":id", m_info.id);
+        query->exec();
+        querymodel->setQuery(*query);
+
         querymodel->setHeaderData(2, Qt::Horizontal, "Принять");
         querymodel->setHeaderData(3, Qt::Horizontal, "Отклонить");
         m_ui->statementTableView->setModel(querymodel);
@@ -349,9 +398,9 @@ void StudentDialog::enterCollective()
          {               
                 QSqlQuery* query = new QSqlQuery(*m_db);
                 QString collectiveName = d.getName();
-                query->prepare("INSERT INTO counts(student_id, team_id, count_for, count_against) VALUES (:student_id, (SELECT id FROM teams WHERE name = :team_id), 0, 0);");
+                query->prepare("INSERT INTO counts(student_id, team_id, count_for, count_against) VALUES (:student_id, (SELECT id FROM teams WHERE name = :name), 0, 0);");
                 query->bindValue(":student_id", m_info.id);
-                query->bindValue(":team_id", collectiveName);
+                query->bindValue(":name", collectiveName);
                 query->exec();
 
 
