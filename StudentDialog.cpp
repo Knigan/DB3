@@ -1,4 +1,4 @@
-#include "StudentDialog.h"
+﻿#include "StudentDialog.h"
 #include "ui_studentdialog.h"
 #include <QDialogButtonBox>
 #include <QSqlTableModel>
@@ -87,9 +87,9 @@ void StudentDialog::acceptEntering()
 
 
         QSqlQuery* query = new QSqlQuery(*m_db);
-        QSqlQueryModel* querymodel = makeQuery("SELECT count_for FROM requests WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
+        QSqlQueryModel* querymodel = makeQuery("SELECT count_for FROM counts WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
         int count = querymodel->data(querymodel->index(0,0)).toInt();
-        query->prepare("UPDATE requests SET count_for = :count WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
+        query->prepare("UPDATE counts SET count_for = :count WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
         query->bindValue(":count", count + 1);
         query->exec();
 
@@ -97,6 +97,12 @@ void StudentDialog::acceptEntering()
         btn->setText("Clicked");
         QWidget* anotherBtn = m_ui->statementTableView->indexWidget(m_ui->statementTableView->model()->index(index.row(), 3));
         anotherBtn->setEnabled(false);
+
+        query->prepare("DELETE FROM requests WHERE student_id = (SELECT id FROM students WHERE name = :name) AND team_id = :team_id AND student_from_team_id = :student_from_team_id;");
+        query->bindValue(":name", name);
+        query->bindValue(":team_id", m_info.teamId);
+        query->bindValue(":student_from_team_id", m_info.id);
+        query->exec();
     }
 }
 
@@ -108,9 +114,9 @@ void StudentDialog::declineEntering()
         QString name = m_ui->statementTableView->model()->data(m_ui->statementTableView->model()->index(index.row(), 0)).toString();
 
         QSqlQuery* query = new QSqlQuery(*m_db);
-        QSqlQueryModel* querymodel = makeQuery("SELECT count_against FROM requests WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
+        QSqlQueryModel* querymodel = makeQuery("SELECT count_against FROM counts WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
         int count = querymodel->data(querymodel->index(0,0)).toInt();
-        query->prepare("UPDATE requests SET count_against = :count WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
+        query->prepare("UPDATE counts SET count_against = :count WHERE student_id = (SELECT id FROM students WHERE name = '" + name + "');");
         query->bindValue(":count", count + 1);
         query->exec();
 
@@ -118,6 +124,12 @@ void StudentDialog::declineEntering()
         btn->setText("Clicked");
         QWidget* anotherBtn = m_ui->statementTableView->indexWidget(m_ui->statementTableView->model()->index(index.row(), 2));
         anotherBtn->setEnabled(false);
+
+        query->prepare("DELETE FROM requests WHERE student_id = (SELECT id FROM students WHERE name = :name) AND team_id = :team_id AND student_from_team_id = :student_from_team_id;");
+        query->bindValue(":name", name);
+        query->bindValue(":team_id", m_info.teamId);
+        query->bindValue(":student_from_team_id", m_info.id);
+        query->exec();
     }
 }
 
@@ -233,7 +245,7 @@ void StudentDialog::refreshCollectiveInfo()
 
 void StudentDialog::refreshRequests()
 {
-    QSqlQueryModel* querymodel = makeQuery("SELECT * FROM requests;");
+    QSqlQueryModel* querymodel = makeQuery("SELECT * FROM counts;");
     for (int i = 0; i < querymodel->rowCount(); ++i) {
         QString str;
         int team_id = querymodel->data(querymodel->index(i, 1)).toInt();
@@ -246,7 +258,7 @@ void StudentDialog::refreshRequests()
         if (count_for >= count / 2.0f) {
             int student_id = querymodel->data(querymodel->index(i, 0)).toInt();
             QSqlQuery* query = new QSqlQuery(*m_db);
-            query->prepare("UPDATE students SET team_id = :team_id WHERE id = :student_id");
+            query->prepare("UPDATE students SET team_id = :team_id WHERE id = :student_id;");
             query->bindValue(":team_id", team_id);
             query->bindValue(":student_id", student_id);
             query->exec();
@@ -254,31 +266,50 @@ void StudentDialog::refreshRequests()
             refreshCount();
             refreshCount(team_id);
 
-            query->prepare("DELETE FROM requests WHERE student_id = :student_id AND team_id = :team_id");
+            query->prepare("DELETE FROM counts WHERE student_id = :student_id AND team_id = :team_id;");
             query->bindValue(":student_id", student_id);
             query->bindValue(":team_id", team_id);
             query->exec();
+
+            query->prepare("DELETE FROM requests WHERE student_id = :student_id AND team_id = :team_id;");
+            query->bindValue(":student_id", student_id);
+            query->bindValue(":team_id", team_id);
+            query->exec();
+
         }
         else if (count_against >= count / 2.0f) {
                 int student_id = querymodel->data(querymodel->index(i, 0)).toInt();
                 QSqlQuery* query = new QSqlQuery(*m_db);
-                query->prepare("DELETE FROM requests WHERE student_id = :student_id AND team_id = :team_id");
+                query->prepare("DELETE FROM counts WHERE student_id = :student_id AND team_id = :team_id;");
                 query->bindValue(":student_id", student_id);
                 query->bindValue(":team_id", team_id);
                 query->exec();
+
+                query->prepare("DELETE FROM requests WHERE student_id = :student_id AND team_id = :team_id;");
+                query->bindValue(":student_id", student_id);
+                query->bindValue(":team_id", team_id);
+                query->exec();
+
         }
     }
 
     QString str;
-    querymodel = makeQuery("SELECT name, surname, grp, id FROM students WHERE id = (SELECT student_id FROM requests WHERE team_id = " + str.setNum(m_info.teamId) + ");");
-    querymodel->setHeaderData(2, Qt::Horizontal, "Принять");
-    querymodel->setHeaderData(3, Qt::Horizontal, "Отклонить");
-    m_ui->statementTableView->setModel(querymodel);
+    querymodel = makeQuery("SELECT student_id FROM requests WHERE team_id = " + str.setNum(m_info.teamId) + " AND student_from_team_id = " + str.setNum(m_info.id) + ";");
+    int k = querymodel->data(querymodel->index(0,0)).toInt();
+    querymodel = makeQuery("SELECT COUNT(*) FROM requests WHERE student_from_team_id = " + str.setNum(m_info.id));
+    int count = querymodel->data(querymodel->index(0,0)).toInt();
 
-    for (int i = 0; i < querymodel->rowCount(); ++i)
-    {
-        m_ui->statementTableView->setIndexWidget(m_ui->statementTableView->model()->index(i,2), createAcceptButtonWidget());
-        m_ui->statementTableView->setIndexWidget(m_ui->statementTableView->model()->index(i,3), createDeclineButtonWidget());
+    if (count != 0) {
+        querymodel = makeQuery("SELECT name, surname, grp, id FROM students WHERE id = " + str.setNum(k) + ";");
+        querymodel->setHeaderData(2, Qt::Horizontal, "Принять");
+        querymodel->setHeaderData(3, Qt::Horizontal, "Отклонить");
+        m_ui->statementTableView->setModel(querymodel);
+
+        for (int i = 0; i < querymodel->rowCount(); ++i)
+        {
+            m_ui->statementTableView->setIndexWidget(m_ui->statementTableView->model()->index(i,2), createAcceptButtonWidget());
+            m_ui->statementTableView->setIndexWidget(m_ui->statementTableView->model()->index(i,3), createDeclineButtonWidget());
+        }
     }
 }
 
@@ -315,12 +346,25 @@ void StudentDialog::enterCollective()
      if (d.exec() == QDialog::Accepted)
      {
          if (m_info.teamId == 0)
-         {
-            QSqlQuery* query = new QSqlQuery(*m_db);
-            query->prepare("INSERT INTO requests(student_id, team_id, count_for, count_against) VALUES (:student_id, (SELECT id FROM teams WHERE name = :team_id), 0, 0);");
-            query->bindValue(":student_id", m_info.id);
-            query->bindValue(":team_id", d.getName());
-            query->exec();
+         {               
+                QSqlQuery* query = new QSqlQuery(*m_db);
+                QString collectiveName = d.getName();
+                query->prepare("INSERT INTO counts(student_id, team_id, count_for, count_against) VALUES (:student_id, (SELECT id FROM teams WHERE name = :team_id), 0, 0);");
+                query->bindValue(":student_id", m_info.id);
+                query->bindValue(":team_id", collectiveName);
+                query->exec();
+
+
+                QSqlQueryModel* querymodel = makeQuery("SELECT id FROM students WHERE team_id = (SELECT id FROM teams WHERE name = '" + collectiveName + "');");
+                for (int i = 0; i < querymodel->rowCount(); ++i)
+                {
+                    QString str;
+                    query->prepare("INSERT INTO requests(student_id, team_id, student_from_team_id) VALUES(:student_id, (SELECT id FROM teams WHERE name = :collectiveName), :student_from_team_id);");
+                    query->bindValue(":student_id", str.setNum(m_info.id));
+                    query->bindValue(":collectiveName", collectiveName);
+                    query->bindValue(":student_from_team_id", querymodel->data(querymodel->index(i, 0)).toString());
+                    query->exec();
+                }
          }
          else
          {
@@ -355,7 +399,7 @@ void StudentDialog::takeRandomTask()
         }
     }
     qDebug() << randNum << " - result";
-    makeQuery("insert into teams_and_labs(team, laba) VALUES (" + str.setNum(m_info.teamId) + ", " + temp.setNum(randNum) + ");");
+    makeQuery("INSERT INTO teams_and_labs(team, laba) VALUES (" + str.setNum(m_info.teamId) + ", " + temp.setNum(randNum) + ");");
     refreshLabs();
 }
 
