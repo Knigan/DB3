@@ -30,31 +30,47 @@ void SignUp::signup()
         ui->ErrorLabel->setText("Login or password has already used!");
     else {
         if (query->exec("SELECT COUNT(*) FROM students WHERE surname = '" + ui->SurnameLineEdit->text() +
-                        "' AND name = '" + ui->NameLineEdit->text() + "' AND grp = '" + ui->GroupLineEdit->text() + "';")) {
+                        "' AND name = '" + ui->NameLineEdit->text() + "' AND group_id = '" + ui->GroupLineEdit->text() + "';")) {
             querymodel->setQuery(*query);
         }
         int count = querymodel->data(querymodel->index(0,0)).toInt();
         if (count != 0)
             ui->ErrorLabel->setText("This person has already signed up");
         else {
-            query->prepare("INSERT INTO students(id, surname, name, grp, team_id, login, password) VALUES (DEFAULT, :surname, :name, :grp, 0, :login, :password);");
-            query->bindValue(":surname", ui->SurnameLineEdit->text());
-            query->bindValue(":name", ui->NameLineEdit->text());
-            query->bindValue(":grp", ui->GroupLineEdit->text());
-            query->bindValue(":login", ui->LoginLineEdit->text());
-            query->bindValue(":password", ui->PasswordLineEdit->text());
-            query->exec();
 
-            if (query->exec("SELECT COUNT(*) FROM students WHERE team_id = 0;"))
-            {
+            QSqlQueryModel *querymodel = new QSqlQueryModel;
+            if (query->exec("SELECT grp FROM groups WHERE grp = '" + ui->GroupLineEdit->text() + "';")) {
                 querymodel->setQuery(*query);
             }
-            count = querymodel->data(querymodel->index(0,0)).toInt();
-            query->prepare("UPDATE teams SET count_of_students = :count WHERE id = 0;");
-            query->bindValue(":count", count);
-            query->exec();
+            QString name = querymodel->data(querymodel->index(0,0)).toString();
+            if (name == "")
+                ui->ErrorLabel->setText("This group doesn't exist!");
+            else {
 
-            this->close();
+                if (query->exec("SELECT id FROM groups WHERE grp = '" + ui->GroupLineEdit->text() + "';")) {
+                    querymodel->setQuery(*query);
+                }
+                int id = querymodel->data(querymodel->index(0,0)).toInt();
+
+                query->prepare("INSERT INTO students(id, surname, name, group_id, team_id, login, password) VALUES (DEFAULT, :surname, :name, :group_id, 0, :login, :password);");
+                query->bindValue(":surname", ui->SurnameLineEdit->text());
+                query->bindValue(":name", ui->NameLineEdit->text());
+                query->bindValue(":group_id", id);
+                query->bindValue(":login", ui->LoginLineEdit->text());
+                query->bindValue(":password", ui->PasswordLineEdit->text());
+                query->exec();
+
+                if (query->exec("SELECT COUNT(*) FROM students WHERE team_id = 0;"))
+                {
+                    querymodel->setQuery(*query);
+                }
+                count = querymodel->data(querymodel->index(0,0)).toInt();
+                query->prepare("UPDATE teams SET count_of_students = :count WHERE id = 0;");
+                query->bindValue(":count", count);
+                query->exec();
+
+                this->close();
+            }
         }
     }
 }

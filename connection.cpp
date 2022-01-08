@@ -12,11 +12,11 @@ Connection::Connection(QWidget *parent) :
 
     ConnectionInfo info;
     load_ConnectionInfo(info);
-    set_host(info.host);
-    set_login(info.login);
-    set_password(info.password);
-    set_port(info.port);
-    set_DBName(info.DBName);
+    ui->HostLineEdit->insert(info.host);
+    ui->LoginLineEdit->insert(info.login);
+    ui->PasswordLineEdit->insert(info.password);
+    ui->PortLineEdit->insert(QString::number(info.port));
+    ui->DBNameLineEdit->insert(info.DBName);
 
     exec();
 }
@@ -24,47 +24,6 @@ Connection::Connection(QWidget *parent) :
 Connection::~Connection()
 {
     delete ui;
-}
-
-QString Connection::get_host() {
-    return ui->HostLineEdit->text();
-}
-
-QString Connection::get_login() {
-    return ui->LoginLineEdit->text();
-}
-
-QString Connection::get_password() {
-    return ui->PasswordLineEdit->text();
-}
-
-int Connection::get_port() {
-    return ui->PortLineEdit->text().toInt();
-}
-
-QString Connection::get_DBName() {
-    return ui->DBNameLineEdit->text();
-}
-
-void Connection::set_host(QString& host) {
-    ui->HostLineEdit->insert(host);
-}
-
-void Connection::set_login(QString& login) {
-    ui->LoginLineEdit->insert(login);
-}
-
-void Connection::set_password(QString& password) {
-    ui->PasswordLineEdit->insert(password);
-}
-
-void Connection::set_port(int port) {
-    QString str;
-    ui->PortLineEdit->insert(str.setNum(port));
-}
-
-void Connection::set_DBName(QString& DBName) {
-    ui->DBNameLineEdit->insert(DBName);
 }
 
 void Connection::save_ConnectionInfo(const ConnectionInfo &info) {
@@ -87,11 +46,11 @@ void Connection::accept() {
     DB = QSqlDatabase::addDatabase("QPSQL", "Database");
 
     ConnectionInfo info;
-    info.host = get_host();
-    info.login = get_login();
-    info.password = get_password();
-    info.port = get_port();
-    info.DBName = get_DBName();
+    info.host = ui->HostLineEdit->text();
+    info.login = ui->LoginLineEdit->text();
+    info.password = ui->PasswordLineEdit->text();
+    info.port = ui->PortLineEdit->text().toInt();
+    info.DBName = ui->DBNameLineEdit->text();
 
     DB.setHostName(info.host);
     DB.setPort(info.port);

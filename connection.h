@@ -28,16 +28,6 @@ public:
 
     explicit Connection(QWidget *parent = nullptr);
     ~Connection();
-    QString get_host();
-    QString get_login();
-    QString get_password();
-    int get_port();
-    QString get_DBName();
-    void set_host(QString&);
-    void set_login(QString&);
-    void set_password(QString&);
-    void set_port(int);
-    void set_DBName(QString&);
 
 
 private slots:

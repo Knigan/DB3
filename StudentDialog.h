@@ -37,7 +37,7 @@ struct StudentInfo
     int teamId;
     QString name;
     QString surname;
-    QString group;
+    int groupId;
 
     StudentInfo():
         login(""),
@@ -46,7 +46,7 @@ struct StudentInfo
         teamId(0),
         name(""),
         surname(""),
-        group("")
+        groupId(0)
     {}
 };
 
