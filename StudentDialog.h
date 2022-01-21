@@ -91,7 +91,6 @@ private:
     void refreshCollectiveInfo();
     void refreshRequests();
     void refreshLabs();
-    void refreshCount(int team_id = 0);
 
 };
 

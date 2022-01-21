@@ -191,11 +191,8 @@ void StudentDialog::leaveCollective()
         query->bindValue(":id", m_info.id);
         query->exec();
 
-        refreshCount(m_info.teamId);
         m_info.teamId = 0;
-        refreshCount();
         refreshCollectiveInfo();
-        query->exec("DELETE FROM teams WHERE count_of_students = 0 AND name != 'zeroclub';");
     }
 }
 
@@ -208,7 +205,7 @@ void StudentDialog::exit()
     m.setDefaultButton(QMessageBox::Cancel);
 
     if (m.exec() == QMessageBox::Yes)
-        this->close();
+        close();
 }
 
 void StudentDialog::refresh() {
@@ -248,7 +245,6 @@ void StudentDialog::createCollective()
                 query->bindValue(":id", m_info.id);
                 query->exec();
 
-                refreshCount();
                 refreshCollectiveInfo();
             }
             else {
@@ -276,7 +272,6 @@ void StudentDialog::refreshCollectiveInfo()
     QSqlQueryModel* querymodel = makeQuery("SELECT name FROM teams WHERE id = " + QString::number(m_info.teamId) + ";");
     m_ui->CollectiveName->setText(querymodel->data(querymodel->index(0,0)).toString());
 
-    refreshCount(m_info.teamId);
     querymodel = makeQuery("SELECT count_of_students FROM teams WHERE id = " + QString::number(m_info.teamId) + ";");
     m_ui->CollectiveNumber->setText(querymodel->data(querymodel->index(0,0)).toString());
 
@@ -302,9 +297,6 @@ void StudentDialog::refreshRequests()
             query->bindValue(":team_id", team_id);
             query->bindValue(":student_id", student_id);
             query->exec();
-
-            refreshCount();
-            refreshCount(team_id);
 
             query->prepare("DELETE FROM counts WHERE student_id = :student_id AND team_id = :team_id;");
             query->bindValue(":student_id", student_id);
@@ -360,15 +352,6 @@ void StudentDialog::refreshLabs()
 {
     QSqlQueryModel* querymodel = makeQuery("SELECT name FROM labs;");
     m_ui->listView->setModel(querymodel);
-}
-
-void StudentDialog::refreshCount(int team_id) {
-    QSqlQueryModel* querymodel = makeQuery("SELECT COUNT(*) FROM students WHERE team_id = " + QString::number(team_id) + ";");
-    int count = querymodel->data(querymodel->index(0,0)).toInt();
-    QSqlQuery* query = new QSqlQuery(*m_db);
-    query->prepare("UPDATE teams SET count_of_students = :count WHERE id = " + QString::number(team_id) + ";");
-    query->bindValue(":count", count);
-    query->exec();
 }
 
 QSqlQueryModel* StudentDialog::makeQuery(const QString& queryString)

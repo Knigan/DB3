@@ -66,16 +66,7 @@ void SignUp::signup()
             query->bindValue(":password", ui->PasswordLineEdit->text());
             query->exec();
 
-            if (query->exec("SELECT COUNT(*) FROM students WHERE team_id = 0;"))
-            {
-                querymodel->setQuery(*query);
-            }
-            count = querymodel->data(querymodel->index(0,0)).toInt();
-            query->prepare("UPDATE teams SET count_of_students = :count WHERE id = 0;");
-            query->bindValue(":count", count);
-            query->exec();
-
-            this->close();
+            close();
         }
     }
 }
