@@ -1,7 +1,7 @@
 #ifndef STUDENTDIALOG_H
 #define STUDENTDIALOG_H
 
-#include "signin.h"
+#include "StudentSignIn.h"
 #include "editprofiledialog.h"
 #include "createcollectivedialog.h"
 #include "entercollectivedialog.h"

@@ -10,6 +10,8 @@ CONFIG += c++11
 
 SOURCES += \
     StudentDialog.cpp \
+    StudentSignIn.cpp \
+    StudentSignUp.cpp \
     TeacherDialog.cpp \
     connection.cpp \
     createcollectivedialog.cpp \
@@ -17,33 +19,31 @@ SOURCES += \
     entercollectivedialog.cpp \
     main.cpp \
     mainwindow.cpp \
-    signin.cpp \
-    signup.cpp \
     teachersignin.cpp
 
 HEADERS += \
     StudentDialog.h \
+    StudentSignIn.h \
+    StudentSignUp.h \
     TeacherDialog.h \
     connection.h \
     createcollectivedialog.h \
     editprofiledialog.h \
     entercollectivedialog.h \
     mainwindow.h \
-    signin.h \
-    signup.h \
     teachersignin.h
 
 FORMS += \
     StudentDialog.ui \
+    StudentSignIn.ui \
+    StudentSignUp.ui \
     TeacherDialog.ui \
     TeacherSignIn.ui \
     connection.ui \
     createcollectivedialog.ui \
     editprofiledialog.ui \
     entercollectivedialog.ui \
-    mainwindow.ui \
-    signin.ui \
-    signup.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -1,11 +1,15 @@
 #include "teachersignin.h"
 #include "ui_TeacherSignIn.h"
 
-TeacherSignIn::TeacherSignIn(QWidget *parent):
+TeacherSignIn::TeacherSignIn(QWidget *parent, QSettings* ptr, QSqlDatabase* DB):
     QDialog(parent),
-    ui(new Ui::TeacherSignIn)
+    ui(new Ui::TeacherSignIn),
+    sign_in(ptr),
+    db(DB)
 {
     ui->setupUi(this);
+
+    connect(ui->SignInButton, &QPushButton::clicked, this, &TeacherSignIn::signin);
 }
 
 TeacherSignIn::~TeacherSignIn()
@@ -13,18 +17,28 @@ TeacherSignIn::~TeacherSignIn()
     delete ui;
 }
 
-QString TeacherSignIn::get_login() {
-    return ui->nameLineEdit->text();
+void TeacherSignIn::signin(){
+    ui->ErrorLabel->clear();
+    info.login = ui->LoginLineEdit->text();
+    info.password = ui->PasswordLineEdit->text();
+
+    QSqlQuery* query = new QSqlQuery(*db);
+    QSqlQueryModel *querymodel = new QSqlQueryModel;
+    if (query->exec("SELECT name FROM teachers WHERE login = '" + info.login + "' AND password = '" + info.password + "';")) {
+        querymodel->setQuery(*query);
+    }
+    QString name = querymodel->data(querymodel->index(0,0)).toString();
+    if (name == "")
+        ui->ErrorLabel->setText("Login or password was incorrect!");
+    else {
+        close();
+    }
 }
 
-QString TeacherSignIn::get_password() {
-    return ui->passwordLineEdit->text();
+QString TeacherSignIn::get_login(){
+    return info.login;
 }
 
-void TeacherSignIn::set_login(const QString& S) {
-    ui->nameLineEdit->insert(S);
-}
-
-void TeacherSignIn::set_password(const QString& G) {
-    ui->nameLineEdit->insert(G);
+QString TeacherSignIn::get_password(){
+    return info.password;
 }
