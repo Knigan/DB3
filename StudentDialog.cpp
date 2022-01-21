@@ -384,7 +384,7 @@ QSqlQueryModel* StudentDialog::makeQuery(const QString& queryString)
 
 void StudentDialog::enterCollective()
 {
-     EnterCollectiveDialog d;
+     EnterCollectiveDialog d(nullptr, m_db);
      if (d.exec() == QDialog::Accepted)
      {
          if (m_info.teamId == 0)

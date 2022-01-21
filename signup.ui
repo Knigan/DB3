@@ -106,16 +106,6 @@
     <string>Group</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="GroupLineEdit">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>180</y>
-     <width>481</width>
-     <height>24</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="LoginLabel">
    <property name="geometry">
     <rect>
@@ -202,6 +192,16 @@
    </property>
    <property name="text">
     <string/>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>180</y>
+     <width>481</width>
+     <height>24</height>
+    </rect>
    </property>
   </widget>
  </widget>
