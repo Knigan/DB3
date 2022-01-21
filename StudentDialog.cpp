@@ -18,7 +18,7 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     connect(m_ui->enterCollectiveButton , &QPushButton::clicked, this, &StudentDialog::enterCollective);
     connect(m_ui->takeRandomTaskButton  , &QPushButton::clicked, this, &StudentDialog::takeRandomTask);
 
-    m_settings = new QSettings("signin_config.ini", QSettings::IniFormat, this);
+    m_settings = new QSettings("student_config.ini", QSettings::IniFormat, this);
     SignIn S(nullptr, m_settings, m_db);
     load_StudentInfo(m_info);
 

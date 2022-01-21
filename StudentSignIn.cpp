@@ -1,5 +1,5 @@
 #include "StudentSignIn.h"
-#include "ui_signin.h"
+#include "ui_StudentSignIn.h"
 
 SignIn::SignIn(QWidget *parent, QSettings* ptr, QSqlDatabase* DB) :
     QDialog(parent),

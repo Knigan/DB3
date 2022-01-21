@@ -10,6 +10,12 @@ TeacherSignIn::TeacherSignIn(QWidget *parent, QSettings* ptr, QSqlDatabase* DB):
     ui->setupUi(this);
 
     connect(ui->SignInButton, &QPushButton::clicked, this, &TeacherSignIn::signin);
+
+    info.load_SignInInfo(sign_in);
+    ui->LoginLineEdit->insert(info.login);
+    ui->PasswordLineEdit->insert(info.password);
+
+    exec();
 }
 
 TeacherSignIn::~TeacherSignIn()
@@ -31,6 +37,7 @@ void TeacherSignIn::signin(){
     if (name == "")
         ui->ErrorLabel->setText("Login or password was incorrect!");
     else {
+        info.save_SignInInfo(sign_in);
         close();
     }
 }

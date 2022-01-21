@@ -22,10 +22,13 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>Комната студента</string>
+   <string>Личный кабинет студента</string>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">background-color: rgb(255, 255, 127);</string>
   </property>
   <widget class="QTabWidget" name="tabWidget">
    <property name="enabled">
@@ -53,8 +56,16 @@
    </property>
    <property name="font">
     <font>
+     <family>MS Shell Dlg 2</family>
      <pointsize>10</pointsize>
+     <weight>9</weight>
+     <italic>false</italic>
+     <bold>false</bold>
     </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">font: 75 10pt &quot;MS Shell Dlg 2&quot;;
+background-color: rgb(255, 234, 191);</string>
    </property>
    <property name="currentIndex">
     <number>2</number>
@@ -74,7 +85,11 @@
      </property>
      <property name="font">
       <font>
+       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
+       <weight>9</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -92,7 +107,11 @@
      </property>
      <property name="font">
       <font>
+       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
+       <weight>9</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -110,7 +129,11 @@
      </property>
      <property name="font">
       <font>
+       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
+       <weight>9</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -141,8 +164,11 @@
      </property>
      <property name="font">
       <font>
+       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <bold>true</bold>
+       <weight>9</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -160,8 +186,11 @@
      </property>
      <property name="font">
       <font>
+       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <bold>true</bold>
+       <weight>9</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -179,8 +208,11 @@
      </property>
      <property name="font">
       <font>
+       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <bold>true</bold>
+       <weight>9</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -265,8 +297,11 @@
      </property>
      <property name="font">
       <font>
+       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <bold>true</bold>
+       <weight>9</weight>
+       <italic>false</italic>
+       <bold>false</bold>
       </font>
      </property>
      <property name="text">
@@ -318,11 +353,15 @@
         </property>
         <property name="font">
          <font>
+          <family>MS Shell Dlg 2</family>
           <pointsize>10</pointsize>
+          <weight>9</weight>
+          <italic>false</italic>
+          <bold>false</bold>
          </font>
         </property>
         <property name="styleSheet">
-         <string notr="true">color: rgb(255, 20, 12);</string>
+         <string notr="true"/>
         </property>
         <property name="text">
          <string>Выйти из коллектива</string>
@@ -466,7 +505,23 @@
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
-       <widget class="QListView" name="listView"/>
+       <widget class="QListView" name="listView">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border-color: rgb(255, 0, 0);</string>
+        </property>
+       </widget>
        <widget class="QPlainTextEdit" name="plainTextEdit">
         <property name="readOnly">
          <bool>true</bool>
@@ -519,6 +574,9 @@
         <pointsize>10</pointsize>
        </font>
       </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(85, 0, 0);</string>
+      </property>
       <property name="text">
        <string>Выход</string>
       </property>
@@ -526,6 +584,9 @@
     </item>
     <item row="0" column="1">
      <widget class="QPushButton" name="refreshButton">
+      <property name="styleSheet">
+       <string notr="true">background-color: rgb(255, 85, 0);</string>
+      </property>
       <property name="text">
        <string>Обновить</string>
       </property>

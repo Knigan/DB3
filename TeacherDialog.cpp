@@ -27,9 +27,9 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
                 m_ui->labsListView->setModel(querymodel);
     });
 
-    m_settings = new QSettings("connection_config.ini", QSettings::IniFormat, this);
+    m_settings = new QSettings("teacher_config.ini", QSettings::IniFormat, this);
     TeacherSignIn T(nullptr, m_settings, m_db);
-    T.exec();
+    load_TeacherInfo(m_info);
 
     QSqlQueryModel* querymodel = makeQuery("SELECT id, object, name, surname FROM teachers WHERE login = '" + QString(T.get_login()) + "' and password = '" + QString(T.get_password()) + "';");
     m_info.login     = T.get_login();
@@ -64,7 +64,7 @@ TeacherDialog::~TeacherDialog()
     delete m_ui;
 }
 
-void TeacherDialog::signUpTeacher(){
+void TeacherDialog::signUpTeacher() {
     m_ui->surnameErrorLabel->setText("");
     m_ui->nameErrorLabel->setText("");
     m_ui->loginErrorLabel->setText("");
@@ -73,29 +73,68 @@ void TeacherDialog::signUpTeacher(){
 
     QSqlQueryModel* querymodel = makeQuery("SELECT login FROM teachers WHERE login = '" + m_ui->loginLine->text() + "';");
     QModelIndexList qmodellist = m_ui->subjectsListView->selectionModel()->selectedIndexes();
-    if(m_ui->surnameLine->text() == "") m_ui->surnameErrorLabel->setText("Введите Вашу фамилию!");
-    if(m_ui->nameLine->text() == "") m_ui->nameErrorLabel->setText("Введите Ваше имя!");
-    if(m_ui->loginLine->text() == "") m_ui->loginErrorLabel->setText("Введите логин!");
-    if(m_ui->passwordLine->text() == "") m_ui->passwordErrorLabel->setText("Введите пароль!");
-    if(m_ui->passwordLine->text() != m_ui->password2Line->text()) m_ui->passwordErrorLabel->setText("Пароли не совпадают!");
-    if(qmodellist.count() == 0) m_ui->subjectErrorLabel->setText("Выберите предмет!");
-    if(querymodel->rowCount() != 0) m_ui->loginErrorLabel->setText("Логин уже занят!");
-    if(querymodel->rowCount() != 0) m_ui->passwordErrorLabel->setText("Пароль уже занят!");
-    if ((m_ui->surnameErrorLabel->text() == "")
-            && (m_ui->nameErrorLabel->text() == "")
-            && (m_ui->loginErrorLabel->text() == "")
-            && (m_ui->subjectErrorLabel->text() == "")
-            && (m_ui->passwordErrorLabel->text() == "")){
 
+    static bool b = true;
+
+    if (m_ui->passwordLine->text() != m_ui->password2Line->text()) {
+        m_ui->passwordErrorLabel->setText("Пароли не совпадают!");
+        b = false;
+    }
+
+    if (qmodellist.count() == 0) {
+        m_ui->subjectErrorLabel->setText("Выберите предмет!");
+        b = false;
+    }
+
+    if (querymodel->rowCount() != 0) {
+        m_ui->loginErrorLabel->setText("Логин уже занят!");
+        b = false;
+    }
+
+    if (querymodel->rowCount() != 0) {
+        m_ui->passwordErrorLabel->setText("Пароль уже занят!");
+        b = false;
+    }
+
+    if (m_ui->surnameLine->text() == "") {
+        m_ui->surnameErrorLabel->setText("Введите Вашу фамилию!");
+        b = false;
+    }
+    if (m_ui->nameLine->text() == "") {
+        m_ui->nameErrorLabel->setText("Введите Ваше имя!");
+        b = false;
+    }
+    if (m_ui->loginLine->text() == "") {
+        m_ui->loginErrorLabel->setText("Введите логин!");
+        b = false;
+    }
+    if (m_ui->passwordLine->text() == "") {
+        m_ui->passwordErrorLabel->setText("Введите пароль!");
+        b = false;
+    }
+    if (m_ui->password2Line->text() == "") {
+        m_ui->passwordErrorLabel->setText("Введите пароль повторно!");
+        b = false;
+    }
+    if (b) {
         int subjectId;
         QModelIndexList Index = m_ui->collectivesListView->selectionModel()->selectedIndexes();
         QString subjectname = Index[0].data().toString();
+        qDebug() << subjectname;
         querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + subjectname + "';");
         subjectId = querymodel->data(querymodel->index(0,0)).toInt();
+        qDebug() << subjectId;
 
-        makeQuery("INSERT INTO teachers(id, surname, name, object, login, password) VALUES (DEFAULT, '"
+        /*makeQuery("INSERT INTO teachers(id, surname, name, object, login, password) VALUES (DEFAULT, '"
                   + m_ui->surnameLine->text() + "', '" + m_ui->nameLine->text() + "', " + QString::number(subjectId) + ", '"
-                  + m_ui->loginLine->text() + "', '" + m_ui->passwordLine->text() + "');");
+                  + m_ui->loginLine->text() + "', '" + m_ui->passwordLine->text() + "');");*/
+        QSqlQuery* query = new QSqlQuery(*m_db);
+        query->prepare("INSERT INTO teachers VALUES (DEFAULT, :surname, :name, :object, :login, :password);");
+        query->bindValue(":surname", m_ui->surnameLine->text());
+        query->bindValue(":name", m_ui->nameLine->text());
+        query->bindValue(":object", subjectId);
+        query->bindValue(":login", m_ui->loginLine->text());
+        query->bindValue(":password", m_ui->passwordLine->text());
         m_ui->successLabel->setText("Пользователь успешно создан!");
     }
 }

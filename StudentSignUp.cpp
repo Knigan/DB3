@@ -1,5 +1,5 @@
 #include "StudentSignUp.h"
-#include "ui_signup.h"
+#include "ui_StudentSignUp.h"
 
 SignUp::SignUp(QWidget *parent, QSqlDatabase* DB) :
     QDialog(parent),
