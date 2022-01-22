@@ -67,10 +67,7 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
         m_ui->ObjectsComboBox->addItem(str);
     }
 
-    refreshCollectiveInfo();
-    refreshRequests();
-    refreshLabs();
-
+    refresh();
     exec();
 }
 

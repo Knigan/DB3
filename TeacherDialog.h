@@ -18,6 +18,7 @@
 #include <QAbstractItemModel>
 #include <QErrorMessage>
 #include <QDebug>
+#include "administration.h"
 
 namespace Ui {
 class TeacherDialog;
@@ -27,7 +28,7 @@ class TeacherDialog : public QDialog
 {
     Q_OBJECT
 
-struct TeacherInfo{
+struct TeacherInfo {
     QString login;
     QString password;
     int id;
@@ -51,6 +52,7 @@ private slots:
     void editProfile();
     void giveTask();
     void signUpTeacher();
+    void admin();
 
 private:
     QSqlDatabase* m_db;

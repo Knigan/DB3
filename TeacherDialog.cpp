@@ -66,6 +66,11 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         m_ui->comboBox->addItem(str);
     }
 
+    if (m_info.id != 1)
+        m_ui->AdministrationButton->setEnabled(false);
+
+    connect(m_ui->AdministrationButton, &QPushButton::clicked, this, &TeacherDialog::admin);
+
     exec();
 }
 
@@ -81,7 +86,7 @@ void TeacherDialog::signUpTeacher() {
     m_ui->subjectErrorLabel->setText("");
     m_ui->passwordErrorLabel->setText("");
 
-    QSqlQueryModel* querymodel = makeQuery("SELECT login FROM teachers WHERE login = '" + m_ui->loginLine->text() + "';");
+    QSqlQueryModel* querymodel = makeQuery("SELECT login FROM teachers WHERE login = '" + m_ui->loginLine->text() + "' AND password = '" + m_ui->passwordLine->text() + "');");
     bool b = true;
 
     if (m_ui->passwordLine->text() != m_ui->password2Line->text()) {
@@ -90,14 +95,10 @@ void TeacherDialog::signUpTeacher() {
     }
 
     if (querymodel->rowCount() != 0) {
-        m_ui->loginErrorLabel->setText("Логин уже занят!");
+        m_ui->loginErrorLabel->setText("Логин или пароль уже занят!");
         b = false;
     }
 
-    if (querymodel->rowCount() != 0) {
-        m_ui->passwordErrorLabel->setText("Пароль уже занят!");
-        b = false;
-    }
 
     if (m_ui->surnameLine->text() == "") {
         m_ui->surnameErrorLabel->setText("Введите Вашу фамилию!");
@@ -119,6 +120,20 @@ void TeacherDialog::signUpTeacher() {
         m_ui->passwordErrorLabel->setText("Введите пароль повторно!");
         b = false;
     }
+
+
+    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->comboBox->currentText() + "';");
+    int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT id FROM teachers WHERE surname = '" + m_ui->surnameLine->text()
+                           + "' AND name = '" + m_ui->nameLine->text() + "' AND object_id = "
+                           + QString::number(object_id) + ";");
+
+    if (querymodel->rowCount() != 0) {
+        m_ui->surnameErrorLabel->setText("Этот пользователь уже зарегистрирован!");
+        b = false;
+    }
+
     if (b) {
         QSqlQuery* query = new QSqlQuery(*m_db);
         QSqlQueryModel* querymodel = new QSqlQueryModel;
@@ -214,6 +229,10 @@ void TeacherDialog::exit(){
 
     if (m.exec() == QMessageBox::Yes)
         this->close();
+}
+
+void TeacherDialog::admin() {
+    Administration A(m_db);
 }
 
 void TeacherDialog::save_TeacherInfo(const TeacherInfo& info)

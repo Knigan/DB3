@@ -13,6 +13,7 @@ SOURCES += \
     StudentSignIn.cpp \
     StudentSignUp.cpp \
     TeacherDialog.cpp \
+    administration.cpp \
     connection.cpp \
     createcollectivedialog.cpp \
     editprofiledialog.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     StudentSignIn.h \
     StudentSignUp.h \
     TeacherDialog.h \
+    administration.h \
     connection.h \
     createcollectivedialog.h \
     editprofiledialog.h \
@@ -38,6 +40,7 @@ FORMS += \
     StudentSignUp.ui \
     TeacherDialog.ui \
     TeacherSignIn.ui \
+    administration.ui \
     connection.ui \
     createcollectivedialog.ui \
     editprofiledialog.ui \
