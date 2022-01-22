@@ -22,17 +22,20 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     SignIn S(nullptr, m_settings, m_db);
     load_StudentInfo(m_info);
 
-    connect(m_ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    connect(m_ui->LabsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
     [=](int index){
+        QString str = m_ui->ObjectsComboBox->currentText();
+        QSqlQueryModel* querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + str + "';");
+        int id = querymodel->data(querymodel->index(0, 0)).toInt();
         if (index == 0)
         {
-            QSqlQueryModel* querymodel = makeQuery("SELECT name FROM labs join groups_and_objects on labs.object = groups_and_objects.object_id WHERE groups_and_objects.group_id = "
-                                                   + QString::number(m_info.groupId) + ";");
+            querymodel = makeQuery("SELECT name FROM labs join groups_and_objects on labs.object = groups_and_objects.object_id WHERE groups_and_objects.group_id = "
+                                                   + QString::number(m_info.groupId) + " AND labs.object = " + QString::number(id) + ";");
             m_ui->listView->setModel(querymodel);
         }
         else
         {
-            QSqlQueryModel* querymodel = makeQuery("SELECT name FROM labs join teams_and_labs on teams_and_labs.laba = labs.id WHERE teams_and_labs.team = " + QString::number(m_info.teamId) + ";");
+            QSqlQueryModel* querymodel = makeQuery("SELECT name FROM labs join teams_and_labs on teams_and_labs.laba = labs.id WHERE teams_and_labs.team = " + QString::number(m_info.teamId) + " AND object = " + QString::number(id) + ";");
             m_ui->listView->setModel(querymodel);
         }
     });
@@ -56,6 +59,19 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     m_ui->studentSurnameLabel->setText(m_info.surname);
     m_ui->studentNameLabel->setText(m_info.name);
     m_ui->studentGroupLabel->setText(QString::number(m_info.groupId));
+
+    QSqlQuery* query = new QSqlQuery(*m_db);
+
+    query->exec("SELECT COUNT(*) FROM objects;");
+    querymodel->setQuery(*query);
+    int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    for (int i = 1; i <= count; ++i) {
+        query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
+        querymodel->setQuery(*query);
+        QString str = querymodel->data(querymodel->index(0, 0)).toString();
+        m_ui->ObjectsComboBox->addItem(str);
+    }
 
     refreshCollectiveInfo();
     refreshRequests();
@@ -211,6 +227,7 @@ void StudentDialog::exit()
 void StudentDialog::refresh() {
     refreshCollectiveInfo();
     refreshRequests();
+    refreshLabs();
 }
 
 bool StudentDialog::isUniqueCollectiveName(const QString& name)
@@ -350,7 +367,11 @@ void StudentDialog::refreshRequests()
 
 void StudentDialog::refreshLabs()
 {
-    QSqlQueryModel* querymodel = makeQuery("SELECT name FROM labs;");
+    QString str = m_ui->ObjectsComboBox->currentText();
+    QSqlQueryModel* querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + str + "';");
+    int id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT name FROM labs WHERE object = " + QString::number(id) + ";");
     m_ui->listView->setModel(querymodel);
 }
 
@@ -404,7 +425,12 @@ void StudentDialog::enterCollective()
 void StudentDialog::takeRandomTask()
 {
     srand(time(nullptr));
-    QSqlQueryModel* querymodel = makeQuery("SELECT * FROM labs");
+
+    QString str = m_ui->ObjectsComboBox->currentText();
+    QSqlQueryModel* querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + str + "';");
+    int id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT * FROM labs WHERE object = " + QString::number(id) + ";");
 
     int randNum = rand() % querymodel->rowCount();
     bool flag = true;
