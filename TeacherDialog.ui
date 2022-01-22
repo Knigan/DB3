@@ -701,9 +701,7 @@
    </property>
    <property name="font">
     <font>
-     <family>MS Shell Dlg 2</family>
      <pointsize>10</pointsize>
-     <weight>9</weight>
      <italic>false</italic>
      <bold>false</bold>
     </font>
@@ -718,7 +716,7 @@ selection-background-color: rgb(255, 0, 255);
 </string>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>1</number>
    </property>
    <widget class="QWidget" name="ProfileTab">
     <property name="styleSheet">
@@ -738,9 +736,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -760,9 +756,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -782,9 +776,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -804,9 +796,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -839,9 +829,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -861,9 +849,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -899,9 +885,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -921,9 +905,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -948,9 +930,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -970,9 +950,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -992,9 +970,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -1074,9 +1050,7 @@ selection-background-color: rgb(255, 0, 255);
       </property>
       <property name="font">
        <font>
-        <family>MS Shell Dlg 2</family>
         <pointsize>10</pointsize>
-        <weight>9</weight>
         <italic>false</italic>
         <bold>false</bold>
        </font>
@@ -1089,9 +1063,7 @@ selection-background-color: rgb(255, 0, 255);
       <widget class="QListView" name="collectivesListView">
        <property name="font">
         <font>
-         <family>MS Shell Dlg 2</family>
          <pointsize>10</pointsize>
-         <weight>9</weight>
          <italic>false</italic>
          <bold>false</bold>
         </font>
@@ -1104,9 +1076,7 @@ selection-background-color: rgb(255, 0, 255);
        <widget class="QListView" name="studentsListView">
         <property name="font">
          <font>
-          <family>MS Shell Dlg 2</family>
           <pointsize>10</pointsize>
-          <weight>9</weight>
           <italic>false</italic>
           <bold>false</bold>
          </font>
@@ -1118,9 +1088,7 @@ selection-background-color: rgb(255, 0, 255);
        <widget class="QListView" name="labsListView">
         <property name="font">
          <font>
-          <family>MS Shell Dlg 2</family>
           <pointsize>10</pointsize>
-          <weight>9</weight>
           <italic>false</italic>
           <bold>false</bold>
          </font>
@@ -1145,9 +1113,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -1167,9 +1133,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -1189,9 +1153,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -1250,9 +1212,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -1285,9 +1245,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -1307,34 +1265,13 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
      </property>
      <property name="text">
       <string>Зарегистрировать</string>
-     </property>
-    </widget>
-    <widget class="QListView" name="subjectsListView">
-     <property name="geometry">
-      <rect>
-       <x>170</x>
-       <y>250</y>
-       <width>231</width>
-       <height>201</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <family>MS Shell Dlg 2</family>
-       <pointsize>10</pointsize>
-       <weight>9</weight>
-       <italic>false</italic>
-       <bold>false</bold>
-      </font>
      </property>
     </widget>
     <widget class="QLineEdit" name="nameLine">
@@ -1361,9 +1298,7 @@ selection-background-color: rgb(255, 0, 255);
      </property>
      <property name="font">
       <font>
-       <family>MS Shell Dlg 2</family>
        <pointsize>10</pointsize>
-       <weight>9</weight>
        <italic>false</italic>
        <bold>false</bold>
       </font>
@@ -4930,6 +4865,16 @@ selection-background-color: rgb(255, 0, 255);
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
+    <widget class="QComboBox" name="comboBox">
+     <property name="geometry">
+      <rect>
+       <x>180</x>
+       <y>250</y>
+       <width>221</width>
+       <height>24</height>
+      </rect>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QPushButton" name="exitButton">
@@ -4949,9 +4894,7 @@ selection-background-color: rgb(255, 0, 255);
    </property>
    <property name="font">
     <font>
-     <family>MS Shell Dlg 2</family>
      <pointsize>12</pointsize>
-     <weight>9</weight>
      <italic>false</italic>
      <bold>false</bold>
     </font>
