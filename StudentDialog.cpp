@@ -23,21 +23,13 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     load_StudentInfo(m_info);
 
     connect(m_ui->LabsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [=](int index){
-        QString str = m_ui->ObjectsComboBox->currentText();
-        QSqlQueryModel* querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + str + "';");
-        int id = querymodel->data(querymodel->index(0, 0)).toInt();
-        if (index == 0)
-        {
-            querymodel = makeQuery("SELECT name FROM labs join groups_and_objects on labs.object = groups_and_objects.object_id WHERE groups_and_objects.group_id = "
-                                                   + QString::number(m_info.groupId) + " AND labs.object = " + QString::number(id) + ";");
-            m_ui->listView->setModel(querymodel);
-        }
-        else
-        {
-            QSqlQueryModel* querymodel = makeQuery("SELECT name FROM labs join teams_and_labs on teams_and_labs.laba = labs.id WHERE teams_and_labs.team = " + QString::number(m_info.teamId) + " AND object = " + QString::number(id) + ";");
-            m_ui->listView->setModel(querymodel);
-        }
+    [this](){
+        refreshLabs();
+    });
+
+    connect(m_ui->ObjectsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [this](){
+        refreshLabs();
     });
 
     connect(m_ui->listView, &QListView::clicked  ,
@@ -58,7 +50,9 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
 
     m_ui->studentSurnameLabel->setText(m_info.surname);
     m_ui->studentNameLabel->setText(m_info.name);
-    m_ui->studentGroupLabel->setText(QString::number(m_info.groupId));
+    querymodel = makeQuery("SELECT name FROM groups WHERE id = " + QString::number(m_info.groupId) + ";");
+    QString str = querymodel->data(querymodel->index(0, 0)).toString();
+    m_ui->studentGroupLabel->setText(str);
 
     QSqlQuery* query = new QSqlQuery(*m_db);
 
@@ -371,7 +365,12 @@ void StudentDialog::refreshLabs()
     QSqlQueryModel* querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + str + "';");
     int id = querymodel->data(querymodel->index(0, 0)).toInt();
 
-    querymodel = makeQuery("SELECT name FROM labs WHERE object = " + QString::number(id) + ";");
+    if (m_ui->LabsComboBox->currentIndex() == 0)
+        querymodel = makeQuery("SELECT name FROM labs join groups_and_objects on labs.object = groups_and_objects.object_id WHERE groups_and_objects.group_id = "
+                                               + QString::number(m_info.groupId) + " AND labs.object = " + QString::number(id) + ";");
+    else
+        querymodel = makeQuery("SELECT name FROM labs join teams_and_labs on teams_and_labs.laba = labs.id WHERE teams_and_labs.team = " + QString::number(m_info.teamId) + " AND object = " + QString::number(id) + ";");
+
     m_ui->listView->setModel(querymodel);
 }
 
