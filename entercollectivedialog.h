@@ -15,7 +15,7 @@ class EnterCollectiveDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit EnterCollectiveDialog(QWidget *parent = nullptr, QSqlDatabase* db = nullptr);
+    explicit EnterCollectiveDialog(QSqlDatabase* db = nullptr, QWidget *parent = nullptr);
     ~EnterCollectiveDialog();
     QString getName();
 

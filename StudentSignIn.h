@@ -30,7 +30,7 @@ class SignIn : public QDialog
     Q_OBJECT
 
 public:
-    explicit SignIn(QWidget *parent = nullptr, QSettings* ptr = nullptr, QSqlDatabase* DB = nullptr);
+    explicit SignIn(QSqlDatabase* DB = nullptr, QSettings* ptr = nullptr, QWidget *parent = nullptr);
     ~SignIn();
 
 private:

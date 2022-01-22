@@ -19,7 +19,7 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
     connect(m_ui->takeRandomTaskButton  , &QPushButton::clicked, this, &StudentDialog::takeRandomTask);
 
     m_settings = new QSettings("student_config.ini", QSettings::IniFormat, this);
-    SignIn S(nullptr, m_settings, m_db);
+    SignIn S(m_db, m_settings);
     load_StudentInfo(m_info);
 
     connect(m_ui->LabsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
@@ -283,7 +283,7 @@ void StudentDialog::refreshCollectiveInfo()
     querymodel = makeQuery("SELECT count_of_students FROM teams WHERE id = " + QString::number(m_info.teamId) + ";");
     m_ui->CollectiveNumber->setText(querymodel->data(querymodel->index(0,0)).toString());
 
-    querymodel = makeQuery("SELECT name, surname, group_id FROM students WHERE team_id = " + QString::number(m_info.teamId) + ";");
+    querymodel = makeQuery("SELECT students.name AS Имя, surname AS Фамилия, groups.name AS Группа FROM students JOIN groups ON students.group_id = groups.id WHERE team_id = " + QString::number(m_info.teamId) + ";");
     m_ui->CollectiveTableView->setModel(querymodel);
 }
 
@@ -338,7 +338,7 @@ void StudentDialog::refreshRequests()
 
     if (count != 0) {
         QSqlQuery* query = new QSqlQuery(*m_db);
-        query->prepare("SELECT name, surname, group_id, id FROM students WHERE id = (SELECT student_id FROM requests WHERE team_id = :team_id AND student_from_team_id = :id);");
+        query->prepare("SELECT name AS Имя, surname AS Фамилия, group_id, id FROM students WHERE id = (SELECT student_id FROM requests WHERE team_id = :team_id AND student_from_team_id = :id);");
         query->bindValue(":team_id", m_info.teamId);
         query->bindValue(":id", m_info.id);
         query->exec();
@@ -384,7 +384,7 @@ QSqlQueryModel* StudentDialog::makeQuery(const QString& queryString)
 
 void StudentDialog::enterCollective()
 {
-     EnterCollectiveDialog d(nullptr, m_db);
+     EnterCollectiveDialog d(m_db);
      if (d.exec() == QDialog::Accepted)
      {
          if (m_info.teamId == 0)

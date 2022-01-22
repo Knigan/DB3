@@ -30,7 +30,7 @@ class TeacherSignIn: public QDialog
 {
     Q_OBJECT
 public:
-    explicit TeacherSignIn(QWidget *parent = nullptr, QSettings* ptr = nullptr, QSqlDatabase* DB = nullptr);
+    explicit TeacherSignIn(QSqlDatabase* DB = nullptr, QSettings* ptr = nullptr, QWidget *parent = nullptr);
     QString get_login();
     QString get_password();
     ~TeacherSignIn();

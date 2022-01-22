@@ -28,7 +28,7 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
     });
 
     m_settings = new QSettings("teacher_config.ini", QSettings::IniFormat, this);
-    TeacherSignIn T(nullptr, m_settings, m_db);
+    TeacherSignIn T(m_db, m_settings);
     load_TeacherInfo(m_info);
 
     QSqlQueryModel* querymodel = makeQuery("SELECT id, object, name, surname FROM teachers WHERE login = '" + QString(T.get_login()) + "' and password = '" + QString(T.get_password()) + "';");
@@ -64,6 +64,14 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         querymodel->setQuery(*query);
         QString str = querymodel->data(querymodel->index(0, 0)).toString();
         m_ui->comboBox->addItem(str);
+    }
+
+    for (int i = 1; i <= count; ++i)
+    {
+        query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
+        querymodel->setQuery(*query);
+        QString str = querymodel->data(querymodel->index(0, 0)).toString();
+        m_ui->comboBox2->addItem(str);
     }
 
     if (m_info.id != 1)

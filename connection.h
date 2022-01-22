@@ -29,7 +29,6 @@ public:
     explicit Connection(QWidget *parent = nullptr);
     ~Connection();
 
-
 private slots:
 
     void accept();

@@ -1,7 +1,7 @@
 #include "teachersignin.h"
 #include "ui_TeacherSignIn.h"
 
-TeacherSignIn::TeacherSignIn(QWidget *parent, QSettings* ptr, QSqlDatabase* DB):
+TeacherSignIn::TeacherSignIn(QSqlDatabase* DB, QSettings* ptr, QWidget *parent):
     QDialog(parent),
     ui(new Ui::TeacherSignIn),
     sign_in(ptr),
