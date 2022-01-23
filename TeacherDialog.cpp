@@ -27,6 +27,16 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
                 m_ui->labsListView->setModel(querymodel);
     });
 
+    connect(m_ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [this](){
+        refresh();
+    });
+
+    connect(m_ui->comboBox2, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    [this](){
+        refresh();
+    });
+
     m_settings = new QSettings("teacher_config.ini", QSettings::IniFormat, this);
     TeacherSignIn T(m_db, m_settings);
     load_TeacherInfo(m_info);
@@ -54,26 +64,7 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
     querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
     querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
 
-    QSqlQuery* query = new QSqlQuery(*m_db);
-    query->exec("SELECT COUNT(*) FROM objects;");
-    querymodel->setQuery(*query);
-    int count = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    for (int i = 1; i <= count; ++i) {
-        query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
-        querymodel->setQuery(*query);
-        QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        m_ui->comboBox->addItem(str);
-    }
-
-    for (int i = 1; i <= count; ++i)
-    {
-        query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
-        querymodel->setQuery(*query);
-        QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        m_ui->comboBox2->addItem(str);
-    }
-
+    //refresh();
     if (m_info.id != 1)
         m_ui->AdministrationButton->setEnabled(false);
 
@@ -85,6 +76,49 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
 TeacherDialog::~TeacherDialog()
 {
     delete m_ui;
+}
+
+void TeacherDialog::refresh()
+{
+    QSqlQuery* query = new QSqlQuery(*m_db);
+    QSqlQueryModel* querymodel = new QSqlQueryModel;
+    query->exec("SELECT COUNT(*) FROM objects;");
+    querymodel->setQuery(*query);
+    int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    int k = 1;
+
+    for (int i = 1; k <= count; ++i) {
+        query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
+        querymodel->setQuery(*query);
+        QString str = querymodel->data(querymodel->index(0, 0)).toString();
+        if (str != "")
+        {
+            m_ui->comboBox->addItem(str);
+            ++k;
+        }
+    }
+
+    query->exec("SELECT COUNT(*) FROM objects JOIN teachers ON objects.id = teachers.object WHERE teachers.surname = '"
+                + m_info.surname + "' AND teachers.name = '" + m_info.name + "';");
+    querymodel->setQuery(*query);
+    count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    k = 1;
+
+    for (int i = 1; k <= count; ++i)
+    {
+        query->exec("SELECT objects.name FROM objects JOIN teachers ON objects.id = teachers.object WHERE objects.id = "
+                     + QString::number(i) + " AND teachers.surname = '"
+                    + m_info.surname + "' AND teachers.name = '" + m_info.name + "';");
+        querymodel->setQuery(*query);
+        QString str = querymodel->data(querymodel->index(0, 0)).toString();
+        if (str != "")
+        {
+            m_ui->comboBox2->addItem(str);
+            ++k;
+        }
+    }
 }
 
 void TeacherDialog::signUpTeacher() {
@@ -134,8 +168,7 @@ void TeacherDialog::signUpTeacher() {
     int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
     querymodel = makeQuery("SELECT id FROM teachers WHERE surname = '" + m_ui->surnameLine->text()
-                           + "' AND name = '" + m_ui->nameLine->text() + "' AND object_id = "
-                           + QString::number(object_id) + ";");
+                           + "' AND name = '" + m_ui->nameLine->text() + ";");
 
     if (querymodel->rowCount() != 0) {
         m_ui->surnameErrorLabel->setText("Этот пользователь уже зарегистрирован!");

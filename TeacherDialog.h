@@ -63,6 +63,7 @@ private:
     QSqlQueryModel* makeQuery(const QString& queryString);
     void save_TeacherInfo(const TeacherInfo& info);
     void load_TeacherInfo(TeacherInfo& info);
+    void refresh();
 
 public:
 
