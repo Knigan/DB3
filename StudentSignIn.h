@@ -32,6 +32,7 @@ class SignIn : public QDialog
 public:
     explicit SignIn(QSqlDatabase* DB = nullptr, QSettings* ptr = nullptr, QWidget *parent = nullptr);
     ~SignIn();
+    bool exit = true;
 
 private:
     Ui::SignIn *ui;

@@ -12,6 +12,8 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
     connect(m_ui->signUpButton,       &QPushButton::clicked, this, &TeacherDialog::signUpTeacher);
     connect(m_ui->editProfileButton,  &QPushButton::clicked, this, &TeacherDialog::editProfile);
     connect(m_ui->sendPushButton,     &QPushButton::clicked, this, &TeacherDialog::giveTask);
+    connect(m_ui->RefreshButton,      &QPushButton::clicked, this, &TeacherDialog::refresh);
+    connect(m_ui->RefreshButton2,     &QPushButton::clicked, this, &TeacherDialog::refresh);
     connect(m_ui->allGroupsListView,  &QListView::clicked, [this](const QModelIndex& index){
                 QSqlQueryModel* querymodel = makeQuery("SELECT DISTINCT teams.team from groups join (SELECT students.group_id as group, teams.name as team "
                                                        "FROM students JOIN teams ON students.team_id = teams.id) AS teams ON teams.group = groups.id "
@@ -27,50 +29,43 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
                 m_ui->labsListView->setModel(querymodel);
     });
 
-    connect(m_ui->comboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [this](){
-        refresh();
-    });
-
-    connect(m_ui->comboBox2, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [this](){
-        refresh();
-    });
-
     m_settings = new QSettings("teacher_config.ini", QSettings::IniFormat, this);
     TeacherSignIn T(m_db, m_settings);
-    load_TeacherInfo(m_info);
+    if (!T.exit) {
+        load_TeacherInfo(m_info);
 
-    QSqlQueryModel* querymodel = makeQuery("SELECT id, object, name, surname FROM teachers WHERE login = '" + QString(T.get_login()) + "' and password = '" + QString(T.get_password()) + "';");
-    m_info.login     = T.get_login();
-    m_info.password  = T.get_password();
-    m_info.id        = querymodel->data(querymodel->index(0,0)).toInt();
-    m_info.subjectId = querymodel->data(querymodel->index(0,1)).toInt();
-    m_info.name      = querymodel->data(querymodel->index(0,2)).toString();
-    m_info.surname   = querymodel->data(querymodel->index(0,3)).toString();
-    QString subject;
-    querymodel = makeQuery("SELECT name FROM objects WHERE objects.id = " + QString::number(m_info.id) + ";");
-    subject = querymodel->data(querymodel->index(0,0)).toString();
+        QSqlQueryModel* querymodel = makeQuery("SELECT id, object, name, surname FROM teachers WHERE login = '" + QString(T.get_login()) + "' and password = '" + QString(T.get_password()) + "';");
+        m_info.login     = T.get_login();
+        m_info.password  = T.get_password();
+        m_info.id        = querymodel->data(querymodel->index(0,0)).toInt();
+        m_info.subjectId = querymodel->data(querymodel->index(0,1)).toInt();
+        m_info.name      = querymodel->data(querymodel->index(0,2)).toString();
+        m_info.surname   = querymodel->data(querymodel->index(0,3)).toString();
+        QString subject;
+        querymodel = makeQuery("SELECT name FROM objects WHERE objects.id = " + QString::number(m_info.id) + ";");
+        subject = querymodel->data(querymodel->index(0,0)).toString();
 
-    m_ui->infoLoginLabel->setText(m_info.login);
-    m_ui->infoNameLabel->setText(m_info.name);
-    m_ui->infoSurnameLable->setText(m_info.surname);
-    m_ui->infoSubjectLabel->setText(subject);
+        m_ui->infoLoginLabel->setText(m_info.login);
+        m_ui->infoNameLabel->setText(m_info.name);
+        m_ui->infoSurnameLable->setText(m_info.surname);
+        m_ui->infoSubjectLabel->setText(subject);
 
-    querymodel = makeQuery("select name from groups join (select group_id, objects.id as subject "
-                           "from groups_and_objects join objects on groups_and_objects.object_id = objects.id) "
-                           "as gr on gr.group_id = groups.id where subject = " + QString::number(m_info.subjectId) + ";");
-    m_ui->allGroupsListView->setModel(querymodel);
-    querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
-    querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
+        querymodel = makeQuery("select name from groups join (select group_id, objects.id as subject "
+                               "from groups_and_objects join objects on groups_and_objects.object_id = objects.id) "
+                               "as gr on gr.group_id = groups.id where subject = " + QString::number(m_info.subjectId) + ";");
+        m_ui->allGroupsListView->setModel(querymodel);
+        querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
+        querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
 
-    //refresh();
-    if (m_info.id != 1)
-        m_ui->AdministrationButton->setEnabled(false);
+        refresh();
+        if (m_info.id != 1)
+            m_ui->AdministrationButton->setEnabled(false);
 
-    connect(m_ui->AdministrationButton, &QPushButton::clicked, this, &TeacherDialog::admin);
+        connect(m_ui->AdministrationButton, &QPushButton::clicked, this, &TeacherDialog::admin);
 
-    exec();
+        exec();
+
+    }
 }
 
 TeacherDialog::~TeacherDialog()
@@ -88,6 +83,7 @@ void TeacherDialog::refresh()
 
     int k = 1;
 
+    m_ui->comboBox->clear();
     for (int i = 1; k <= count; ++i) {
         query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
         querymodel->setQuery(*query);
@@ -106,6 +102,7 @@ void TeacherDialog::refresh()
 
     k = 1;
 
+    m_ui->comboBox2->clear();
     for (int i = 1; k <= count; ++i)
     {
         query->exec("SELECT objects.name FROM objects JOIN teachers ON objects.id = teachers.object WHERE objects.id = "

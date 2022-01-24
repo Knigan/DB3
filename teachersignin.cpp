@@ -38,6 +38,7 @@ void TeacherSignIn::signin(){
         ui->ErrorLabel->setText("Login or password was incorrect!");
     else {
         info.save_SignInInfo(sign_in);
+        exit = false;
         close();
     }
 }

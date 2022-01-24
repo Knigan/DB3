@@ -39,7 +39,8 @@ void SignIn::signin() {
         ui->ErrorLabel->setText("Login or password was incorrect!");
     else {
         info.save_SignInInfo(sign_in);
-        this->close();
+        exit = false;
+        close();
     }
 }
 

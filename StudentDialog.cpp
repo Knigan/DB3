@@ -20,55 +20,57 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
 
     m_settings = new QSettings("student_config.ini", QSettings::IniFormat, this);
     SignIn S(m_db, m_settings);
-    load_StudentInfo(m_info);
+    if (!S.exit) {
+        load_StudentInfo(m_info);
 
-    connect(m_ui->LabsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [this](){
-        refreshLabs();
-    });
+        connect(m_ui->LabsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                [this](){
+            refreshLabs();
+        });
 
-    connect(m_ui->ObjectsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
-    [this](){
-        refreshLabs();
-    });
+        connect(m_ui->ObjectsComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                [this](){
+            refreshLabs();
+        });
 
-    connect(m_ui->listView, &QListView::clicked  ,
-    [this](const QModelIndex& index)
-    {
-        m_ui->plainTextEdit->clear();
-        QSqlQueryModel* querymodel = makeQuery("SELECT task FROM labs WHERE name = '" + index.data().toString() + "';");
-        m_ui->plainTextEdit->appendPlainText(querymodel->data(querymodel->index(0,0)).toString());
-    });
+        connect(m_ui->listView, &QListView::clicked  ,
+                [this](const QModelIndex& index)
+        {
+            m_ui->plainTextEdit->clear();
+            QSqlQueryModel* querymodel = makeQuery("SELECT task FROM labs WHERE name = '" + index.data().toString() + "';");
+            m_ui->plainTextEdit->appendPlainText(querymodel->data(querymodel->index(0,0)).toString());
+        });
 
-    QSqlQueryModel* querymodel = makeQuery("SELECT surname, name, group_id, team_id, id FROM students WHERE login = '" + m_info.login + "' and password = '" + m_info.password + "';");
-    m_info.surname = querymodel->data(querymodel->index(0,0)).toString();
-    m_info.name    = querymodel->data(querymodel->index(0,1)).toString();
-    m_info.groupId   = querymodel->data(querymodel->index(0,2)).toInt();
-    m_info.teamId  = querymodel->data(querymodel->index(0,3)).toInt();
-    m_info.id = querymodel->data(querymodel->index(0,4)).toInt();
+        QSqlQueryModel* querymodel = makeQuery("SELECT surname, name, group_id, team_id, id FROM students WHERE login = '" + m_info.login + "' and password = '" + m_info.password + "';");
+        m_info.surname = querymodel->data(querymodel->index(0,0)).toString();
+        m_info.name    = querymodel->data(querymodel->index(0,1)).toString();
+        m_info.groupId   = querymodel->data(querymodel->index(0,2)).toInt();
+        m_info.teamId  = querymodel->data(querymodel->index(0,3)).toInt();
+        m_info.id = querymodel->data(querymodel->index(0,4)).toInt();
 
 
-    m_ui->studentSurnameLabel->setText(m_info.surname);
-    m_ui->studentNameLabel->setText(m_info.name);
-    querymodel = makeQuery("SELECT name FROM groups WHERE id = " + QString::number(m_info.groupId) + ";");
-    QString str = querymodel->data(querymodel->index(0, 0)).toString();
-    m_ui->studentGroupLabel->setText(str);
-
-    QSqlQuery* query = new QSqlQuery(*m_db);
-
-    query->exec("SELECT COUNT(*) FROM objects;");
-    querymodel->setQuery(*query);
-    int count = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    for (int i = 1; i <= count; ++i) {
-        query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
-        querymodel->setQuery(*query);
+        m_ui->studentSurnameLabel->setText(m_info.surname);
+        m_ui->studentNameLabel->setText(m_info.name);
+        querymodel = makeQuery("SELECT name FROM groups WHERE id = " + QString::number(m_info.groupId) + ";");
         QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        m_ui->ObjectsComboBox->addItem(str);
-    }
+        m_ui->studentGroupLabel->setText(str);
 
-    refresh();
-    exec();
+        QSqlQuery* query = new QSqlQuery(*m_db);
+
+        query->exec("SELECT COUNT(*) FROM objects;");
+        querymodel->setQuery(*query);
+        int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        for (int i = 1; i <= count; ++i) {
+            query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
+            querymodel->setQuery(*query);
+            QString str = querymodel->data(querymodel->index(0, 0)).toString();
+            m_ui->ObjectsComboBox->addItem(str);
+        }
+
+        refresh();
+        exec();
+    }
 }
 
 QWidget* StudentDialog::createAcceptButtonWidget()

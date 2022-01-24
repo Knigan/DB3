@@ -34,6 +34,7 @@ public:
     QString get_login();
     QString get_password();
     ~TeacherSignIn();
+    bool exit = true;
 
 private:
     Ui::TeacherSignIn *ui;
