@@ -404,8 +404,12 @@ void StudentDialog::refreshLabs()
     if (m_ui->LabsComboBox->currentIndex() == 0)
         querymodel = makeQuery("SELECT name FROM labs join groups_and_objects on labs.object = groups_and_objects.object_id WHERE groups_and_objects.group_id = "
                                                + QString::number(m_info.groupId) + " AND labs.object = " + QString::number(id) + " AND variant = 1;");
-    else
-        querymodel = makeQuery("SELECT name FROM labs join teams_and_labs on teams_and_labs.laba = labs.id WHERE teams_and_labs.team = " + QString::number(m_info.teamId) + " AND object = " + QString::number(id) + ";");
+    else {
+        if (m_info.teamId == 0)
+            querymodel = makeQuery("SELECT id FROM labs WHERE 1 + 1 = 3");
+        else
+            querymodel = makeQuery("SELECT name FROM labs join teams_and_labs on teams_and_labs.laba = labs.id WHERE teams_and_labs.team = " + QString::number(m_info.teamId) + " AND object = " + QString::number(id) + ";");
+    }
 
     m_ui->listView->setModel(querymodel);
 }
