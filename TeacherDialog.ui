@@ -5075,7 +5075,7 @@ selection-background-color: rgb(255, 0, 255);
       <string notr="true">background-color: rgb(85, 170, 255);</string>
      </property>
      <property name="text">
-      <string>Назначить лабораторную</string>
+      <string>Назначить задание</string>
      </property>
     </widget>
     <widget class="QWidget" name="layoutWidget">
@@ -5098,6 +5098,22 @@ selection-background-color: rgb(255, 0, 255);
        <widget class="QComboBox" name="VariantComboBox"/>
       </item>
      </layout>
+    </widget>
+    <widget class="QPushButton" name="AcceptTaskButton">
+     <property name="geometry">
+      <rect>
+       <x>230</x>
+       <y>170</y>
+       <width>131</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(85, 170, 255);</string>
+     </property>
+     <property name="text">
+      <string>Принять задание</string>
+     </property>
     </widget>
    </widget>
   </widget>

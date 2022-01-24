@@ -55,6 +55,7 @@ private slots:
     void admin();
     void addTask();
     void setTask();
+    void acceptTask();
 
 private:
     QSqlDatabase* m_db;

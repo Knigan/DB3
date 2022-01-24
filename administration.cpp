@@ -80,7 +80,7 @@ void Administration::addObject() {
     else {
         if (str != "") {
             query->exec("INSERT INTO objects VALUES (DEFAULT, '" + str + "');");
-            ui->ErrorLabel->clear();
+            ui->ErrorLabel->setText("Успешно!");
         }
         else
             ui->ErrorLabel->setText("Введите название предмета!");
@@ -99,7 +99,7 @@ void Administration::removeStudent() {
     QSqlQuery* query = new QSqlQuery(*db);
     QSqlQueryModel* querymodel = new QSqlQueryModel;
 
-    querymodel = makeQuery("SELECT id FROM groups WHERE name = '" + ui->GroupComboBox->currentText() + "';");
+    querymodel = makeQuery("SELECT id FROM groups WHERE name = '" + ui->StudentGroupComboBox->currentText() + "';");
     int group_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
     querymodel = makeQuery("SELECT * FROM students WHERE surname = '" + ui->StudentSurnameComboBox->currentText()
@@ -112,6 +112,7 @@ void Administration::removeStudent() {
         query->exec("DELETE FROM students WHERE surname = '" + ui->StudentSurnameComboBox->currentText()
                     + "' AND name = '" + ui->StudentNameComboBox->currentText() + "' AND group_id = "
                     + QString::number(group_id) + ";");
+        ui->ErrorLabel->setText("Успешно!");
     }
 
     refresh();
@@ -138,6 +139,7 @@ void Administration::removeTeacher() {
             query->exec("DELETE FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText()
                         + "' AND name = '" + ui->TeacherNameComboBox->currentText()
                         + "' AND object = " + QString::number(object_id) + ";");
+            ui->ErrorLabel->setText("Успешно!");
         }
         else
             ui->ErrorLabel->setText("Нельзя удалить старшего преподавателя!");
@@ -170,6 +172,8 @@ void Administration::setTeacher() {
                     + "', '" + ui->TeacherNameComboBox->currentText()
                     + "', " + QString::number(object_id)
                     + ", '" + login + "', '" + password + "');");
+
+        ui->ErrorLabel->setText("Успешно!");
     }
 
     refresh();
@@ -186,6 +190,7 @@ void Administration::assignObject() {
     int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
     query->exec("INSERT INTO groups_and_objects VALUES (" + QString::number(group_id) + ", " + QString::number(object_id) + ");");
+    ui->ErrorLabel->setText("Успешно!");
     refresh();
 }
 
@@ -201,7 +206,7 @@ void Administration::createGroup() {
     else {
         if (str != "") {
             query->exec("INSERT INTO groups VALUES (DEFAULT, '" + str + "');");
-            ui->ErrorLabel->clear();
+            ui->ErrorLabel->setText("Успешно!");
         }
         else
             ui->ErrorLabel->setText("Введите имя группы!");

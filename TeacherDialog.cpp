@@ -16,6 +16,7 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
     connect(m_ui->RefreshButton2,     &QPushButton::clicked, this, &TeacherDialog::refresh);
     connect(m_ui->AddTaskButton,      &QPushButton::clicked, this, &TeacherDialog::addTask);
     connect(m_ui->SetTaskButton,      &QPushButton::clicked, this, &TeacherDialog::setTask);
+    connect(m_ui->AcceptTaskButton,   &QPushButton::clicked, this, &TeacherDialog::acceptTask);
     connect(m_ui->allGroupsListView,  &QListView::clicked,   this, [this](const QModelIndex& index){
                 QSqlQueryModel* querymodel = makeQuery("SELECT DISTINCT teams.team from groups join (SELECT students.group_id as group, teams.name as team "
                                                        "FROM students JOIN teams ON students.team_id = teams.id) AS teams ON teams.group = groups.id "
@@ -365,8 +366,32 @@ void TeacherDialog::setTask() {
 
     if (querymodel->rowCount() != 0)
         m_ui->CreateTaskErrorLabel->setText("Этот коллектив уже выполняет эту лабораторную работу");
-    else
+    else {
         query->exec("INSERT INTO teams_and_labs VALUES (" + QString::number(team_id) + ", " + QString::number(laba) + ");");
+        m_ui->CreateTaskErrorLabel->setText("Успешно!");
+    }
+}
+
+void TeacherDialog::acceptTask() {
+    QSqlQuery* query = new QSqlQuery(*m_db);
+    QSqlQueryModel* querymodel = new QSqlQueryModel;
+
+    querymodel = makeQuery("SELECT id FROM teams WHERE name = '" + m_ui->TeamsComboBox->currentText() + "';");
+    int team_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
+    int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT laba FROM teams_and_labs JOIN labs ON teams_and_labs.laba = labs.id WHERE teams_and_labs.team = " + QString::number(team_id)
+                           + " AND labs.name = '" + m_ui->NameComboBox->currentText() + "' AND labs.object = " + QString::number(object_id) + ";");
+
+    if (querymodel->rowCount() == 0)
+        m_ui->CreateTaskErrorLabel->setText("Этот коллектив не выполняет эту лабораторную работу");
+    else {
+        int laba = querymodel->data(querymodel->index(0, 0)).toInt();
+        query->exec("DELETE FROM teams_and_labs WHERE team = " + QString::number(team_id) + " AND laba = " + QString::number(laba) + ";");
+        m_ui->CreateTaskErrorLabel->setText("Успешно!");
+    }
 }
 
 void TeacherDialog::exit(){

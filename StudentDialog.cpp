@@ -461,48 +461,6 @@ void StudentDialog::enterCollective()
      }
 }
 
-/*void StudentDialog::takeRandomTask()
-{
-    srand(time(nullptr));
-
-    QString str = m_ui->ObjectsComboBox->currentText();
-    QSqlQueryModel* querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + str + "';");
-    int id = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    querymodel = makeQuery("SELECT * FROM labs WHERE object = " + QString::number(id) + ";");
-
-    int randNum = rand() % querymodel->rowCount();
-    bool flag = true;
-
-    while (flag)
-    {
-        if (isOk(randNum))
-        {
-            flag = false;
-        }
-        else
-        {
-            randNum = rand() % querymodel->rowCount();
-        }
-    }
-    makeQuery("INSERT INTO teams_and_labs(team, laba) VALUES (" + QString::number(m_info.teamId) + ", " + QString::number(randNum) + ");");
-    refreshLabs();
-}
-
-bool StudentDialog::isOk(int num)
-{
-    QSqlQueryModel* query = makeQuery("SELECT laba FROM teams_and_labs WHERE team = " + QString::number(m_info.teamId));
-
-    for(int i = 0; i < query->rowCount(); ++i)
-    {
-        if (num == query->data(query->index(i, 0)).toInt() || num == 0)
-        {
-            return false;
-        }
-    }
-    return true;
-}*/
-
 void StudentDialog::save_StudentInfo(const StudentInfo& info)
 {
     m_settings->setValue("Login", info.login);

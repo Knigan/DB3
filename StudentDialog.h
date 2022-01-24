@@ -68,7 +68,6 @@ private slots:
     void refresh();
     void createCollective();
     void enterCollective();
-    //void takeRandomTask();
     void acceptEntering();
     void declineEntering();
 
@@ -82,7 +81,6 @@ private:
     void save_StudentInfo(const StudentInfo&);
     void load_StudentInfo(StudentInfo&);
 
-    //bool isOk(int num);
     bool isUniqueCollectiveName(const QString&);
 
     QWidget* createAcceptButtonWidget();
