@@ -14,6 +14,7 @@ Administration::Administration(QSqlDatabase* DB, QWidget *parent) :
     connect(ui->RemoveTeacherButton, &QPushButton::clicked, this, &Administration::removeTeacher);
     connect(ui->AssignObject, &QPushButton::clicked, this, &Administration::assignObject);
     connect(ui->GroupButton, &QPushButton::clicked, this, &Administration::createGroup);
+    connect(ui->SetTeacherButton, &QPushButton::clicked, this, &Administration::setTeacher);
 
     refresh();
     exec();
@@ -101,9 +102,18 @@ void Administration::removeStudent() {
     querymodel = makeQuery("SELECT id FROM groups WHERE name = '" + ui->GroupComboBox->currentText() + "';");
     int group_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
-    query->exec("DELETE FROM students WHERE surname = '" + ui->StudentSurnameComboBox->currentText()
-                + "' AND name = '" + ui->StudentNameComboBox->currentText() + "' AND group_id = "
-                + QString::number(group_id) + ";");
+    querymodel = makeQuery("SELECT * FROM students WHERE surname = '" + ui->StudentSurnameComboBox->currentText()
+                           + "' AND name = '" + ui->StudentNameComboBox->currentText() + "' AND group_id = "
+                           + QString::number(group_id) + ";");
+    if (querymodel->rowCount() == 0) {
+        ui->ErrorLabel->setText("Такого студента нет в выбранной группе!");
+    }
+    else {
+        query->exec("DELETE FROM students WHERE surname = '" + ui->StudentSurnameComboBox->currentText()
+                    + "' AND name = '" + ui->StudentNameComboBox->currentText() + "' AND group_id = "
+                    + QString::number(group_id) + ";");
+    }
+
     refresh();
 }
 
@@ -112,21 +122,55 @@ void Administration::removeTeacher() {
 
     QSqlQueryModel* querymodel = new QSqlQueryModel;
 
-    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + ui->ObjectComboBox->currentText() + "';");
+    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + ui->TeacherObjectComboBox->currentText() + "';");
     int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
     querymodel = makeQuery("SELECT id FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText()
                            + "' AND name = '" + ui->TeacherNameComboBox->currentText()
                            + "' AND object = " + QString::number(object_id) + ";");
-    int id = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    if (id != 1) {
-        query->exec("DELETE FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText()
-                    + "' AND name = '" + ui->TeacherNameComboBox->currentText()
-                    + "' AND object = " + QString::number(object_id) + ";");
+    if (querymodel->rowCount() == 0) {
+        ui->ErrorLabel->setText("Этого преподавателя не существует, или он не ведёт выбранный предмет!");
     }
-    else
-        ui->ErrorLabel->setText("Нельзя удалить старшего преподавателя!");
+    else {
+        int id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        if (id != 1) {
+            query->exec("DELETE FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText()
+                        + "' AND name = '" + ui->TeacherNameComboBox->currentText()
+                        + "' AND object = " + QString::number(object_id) + ";");
+        }
+        else
+            ui->ErrorLabel->setText("Нельзя удалить старшего преподавателя!");
+
+    }
+    refresh();
+}
+
+void Administration::setTeacher() {
+    QSqlQuery* query = new QSqlQuery(*db);
+
+    QSqlQueryModel* querymodel = new QSqlQueryModel;
+
+    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + ui->TeacherObjectComboBox->currentText() + "';");
+    int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT * FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText()
+                           + "' AND name = '" + ui->TeacherNameComboBox->currentText()
+                           + "' AND object = " + QString::number(object_id) + ";");
+
+    if (querymodel->rowCount() != 0)
+        ui->ErrorLabel->setText("Этот преподаватель уже ведёт этот предмет!");
+    else {
+        querymodel = makeQuery("SELECT login, password FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText()
+                               + "' AND name = '" + ui->TeacherNameComboBox->currentText() + "';");
+        QString login = querymodel->data(querymodel->index(0, 0)).toString();
+        QString password = querymodel->data(querymodel->index(0, 1)).toString();
+
+        query->exec("INSERT INTO teachers VALUES(DEFAULT, '" + ui->TeacherSurnameComboBox->currentText()
+                    + "', '" + ui->TeacherNameComboBox->currentText()
+                    + "', " + QString::number(object_id)
+                    + ", '" + login + "', '" + password + "');");
+    }
 
     refresh();
 }

@@ -14,6 +14,7 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
     connect(m_ui->sendPushButton,     &QPushButton::clicked, this, &TeacherDialog::giveTask);
     connect(m_ui->RefreshButton,      &QPushButton::clicked, this, &TeacherDialog::refresh);
     connect(m_ui->RefreshButton2,     &QPushButton::clicked, this, &TeacherDialog::refresh);
+    connect(m_ui->AddTaskButton,      &QPushButton::clicked, this, &TeacherDialog::addTask);
     connect(m_ui->allGroupsListView,  &QListView::clicked, [this](const QModelIndex& index){
                 QSqlQueryModel* querymodel = makeQuery("SELECT DISTINCT teams.team from groups join (SELECT students.group_id as group, teams.name as team "
                                                        "FROM students JOIN teams ON students.team_id = teams.id) AS teams ON teams.group = groups.id "
@@ -83,14 +84,14 @@ void TeacherDialog::refresh()
 
     int k = 1;
 
-    m_ui->comboBox->clear();
+    m_ui->AddTeacherComboBox->clear();
     for (int i = 1; k <= count; ++i) {
         query->exec("SELECT name FROM objects WHERE id = " + QString::number(i) + ";");
         querymodel->setQuery(*query);
         QString str = querymodel->data(querymodel->index(0, 0)).toString();
         if (str != "")
         {
-            m_ui->comboBox->addItem(str);
+            m_ui->AddTeacherComboBox->addItem(str);
             ++k;
         }
     }
@@ -102,7 +103,7 @@ void TeacherDialog::refresh()
 
     k = 1;
 
-    m_ui->comboBox2->clear();
+    m_ui->CreateTaskComboBox->clear();
     for (int i = 1; k <= count; ++i)
     {
         query->exec("SELECT objects.name FROM objects JOIN teachers ON objects.id = teachers.object WHERE objects.id = "
@@ -112,7 +113,7 @@ void TeacherDialog::refresh()
         QString str = querymodel->data(querymodel->index(0, 0)).toString();
         if (str != "")
         {
-            m_ui->comboBox2->addItem(str);
+            m_ui->CreateTaskComboBox->addItem(str);
             ++k;
         }
     }
@@ -161,7 +162,7 @@ void TeacherDialog::signUpTeacher() {
     }
 
 
-    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->comboBox->currentText() + "';");
+    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->AddTeacherComboBox->currentText() + "';");
     int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
     querymodel = makeQuery("SELECT id FROM teachers WHERE surname = '" + m_ui->surnameLine->text()
@@ -176,7 +177,7 @@ void TeacherDialog::signUpTeacher() {
         QSqlQuery* query = new QSqlQuery(*m_db);
         QSqlQueryModel* querymodel = new QSqlQueryModel;
 
-        querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->comboBox->currentText() + "';");
+        querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->AddTeacherComboBox->currentText() + "';");
         int subjectId = querymodel->data(querymodel->index(0, 0)).toInt();
 
         query->prepare("INSERT INTO teachers VALUES (DEFAULT, :surname, :name, :object, :login, :password);");
@@ -256,6 +257,26 @@ void TeacherDialog::editProfile() {
             m_ui->errorProfileLable->setText("Данные успешно изменены!");
         }
     }
+}
+
+void TeacherDialog::addTask() {
+    QSqlQuery* query = new QSqlQuery(*m_db);
+    QSqlQueryModel* querymodel = new QSqlQueryModel;
+
+    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
+    qDebug() << "SELECT id FROM object WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';";
+    int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + ";");
+    int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT COUNT(*) FROM labs WHERE name = '" + m_ui->NameLineEdit->text() + "' AND object = " + QString::number(object_id) + ";");
+    int variant = querymodel->data(querymodel->index(0, 0)).toInt() + 1;
+
+    query->exec("INSERT INTO labs VALUES (DEFAULT, '" + m_ui->NameLineEdit->text() + "', " + QString::number(object_id) + ", " + QString::number(count + 1)
+                + ", " + QString::number(variant) + ", '" + m_ui->TaskTextEdit->toPlainText() + "');");
+    qDebug() << "INSERT INTO labs VALUES (DEFAULT, '" + m_ui->NameLineEdit->text() + "', " + QString::number(object_id) + ", " + QString::number(count + 1)
+                + ", " + QString::number(variant) + ", '" + m_ui->TaskTextEdit->toPlainText() + "');";
 }
 
 void TeacherDialog::exit(){

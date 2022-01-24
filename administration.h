@@ -26,6 +26,7 @@ private slots:
     void removeTeacher();
     void assignObject();
     void createGroup();
+    void setTeacher();
 
 private:
     Ui::Administration *ui;

@@ -716,7 +716,7 @@ selection-background-color: rgb(255, 0, 255);
 </string>
    </property>
    <property name="currentIndex">
-    <number>2</number>
+    <number>3</number>
    </property>
    <widget class="QWidget" name="ProfileTab">
     <property name="styleSheet">
@@ -813,6 +813,9 @@ selection-background-color: rgb(255, 0, 255);
        <width>271</width>
        <height>51</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(85, 170, 255);</string>
      </property>
      <property name="text">
       <string>Редактировать профиль</string>
@@ -923,6 +926,9 @@ selection-background-color: rgb(255, 0, 255);
        <height>51</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(85, 170, 255);</string>
+     </property>
      <property name="text">
       <string>Администрирование</string>
      </property>
@@ -1006,6 +1012,9 @@ selection-background-color: rgb(255, 0, 255);
        <width>121</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(85, 170, 255);</string>
      </property>
      <property name="text">
       <string>Назначить</string>
@@ -1282,6 +1291,9 @@ selection-background-color: rgb(255, 0, 255);
        <italic>false</italic>
        <bold>false</bold>
       </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(85, 85, 255);</string>
      </property>
      <property name="text">
       <string>Зарегистрировать</string>
@@ -4878,7 +4890,7 @@ selection-background-color: rgb(255, 0, 255);
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox">
+    <widget class="QComboBox" name="AddTeacherComboBox">
      <property name="geometry">
       <rect>
        <x>180</x>
@@ -4897,6 +4909,9 @@ selection-background-color: rgb(255, 0, 255);
        <height>31</height>
       </rect>
      </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(85, 170, 255);</string>
+     </property>
      <property name="text">
       <string>Обновить</string>
      </property>
@@ -4906,7 +4921,7 @@ selection-background-color: rgb(255, 0, 255);
     <attribute name="title">
      <string>Создать задание</string>
     </attribute>
-    <widget class="QLabel" name="subjectsLable_2">
+    <widget class="QLabel" name="SubjectLable">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -4926,7 +4941,7 @@ selection-background-color: rgb(255, 0, 255);
       <string>Предмет</string>
      </property>
     </widget>
-    <widget class="QComboBox" name="comboBox2">
+    <widget class="QComboBox" name="CreateTaskComboBox">
      <property name="geometry">
       <rect>
        <x>20</x>
@@ -4936,7 +4951,7 @@ selection-background-color: rgb(255, 0, 255);
       </rect>
      </property>
     </widget>
-    <widget class="QTextEdit" name="textEdit">
+    <widget class="QTextEdit" name="TaskTextEdit">
      <property name="geometry">
       <rect>
        <x>480</x>
@@ -4946,7 +4961,7 @@ selection-background-color: rgb(255, 0, 255);
       </rect>
      </property>
     </widget>
-    <widget class="QLabel" name="give_task">
+    <widget class="QLabel" name="TaskLabel">
      <property name="geometry">
       <rect>
        <x>580</x>
@@ -4966,12 +4981,12 @@ selection-background-color: rgb(255, 0, 255);
       <string>Задание</string>
      </property>
     </widget>
-    <widget class="QLabel" name="subjectsLable_3">
+    <widget class="QLabel" name="NameLabel">
      <property name="geometry">
       <rect>
-       <x>240</x>
+       <x>230</x>
        <y>30</y>
-       <width>151</width>
+       <width>161</width>
        <height>30</height>
       </rect>
      </property>
@@ -4986,7 +5001,7 @@ selection-background-color: rgb(255, 0, 255);
       <string>Название лабораторной</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="name_lr">
+    <widget class="QLineEdit" name="NameLineEdit">
      <property name="geometry">
       <rect>
        <x>200</x>
@@ -4999,20 +5014,23 @@ selection-background-color: rgb(255, 0, 255);
       <string/>
      </property>
     </widget>
-    <widget class="QPushButton" name="sendPushButton_2">
+    <widget class="QPushButton" name="AddTaskButton">
      <property name="geometry">
       <rect>
-       <x>260</x>
-       <y>190</y>
-       <width>121</width>
-       <height>71</height>
+       <x>200</x>
+       <y>120</y>
+       <width>231</width>
+       <height>41</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(85, 170, 255);</string>
      </property>
      <property name="text">
       <string>Добавить</string>
      </property>
     </widget>
-    <widget class="QLabel" name="errorLable_2">
+    <widget class="QLabel" name="CreateTaskErrorLabel">
      <property name="geometry">
       <rect>
        <x>210</x>
@@ -5036,6 +5054,9 @@ selection-background-color: rgb(255, 0, 255);
        <width>131</width>
        <height>41</height>
       </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(85, 170, 255);</string>
      </property>
      <property name="text">
       <string>Обновить</string>
