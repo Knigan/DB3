@@ -15,14 +15,15 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
     connect(m_ui->RefreshButton,      &QPushButton::clicked, this, &TeacherDialog::refresh);
     connect(m_ui->RefreshButton2,     &QPushButton::clicked, this, &TeacherDialog::refresh);
     connect(m_ui->AddTaskButton,      &QPushButton::clicked, this, &TeacherDialog::addTask);
-    connect(m_ui->allGroupsListView,  &QListView::clicked, [this](const QModelIndex& index){
+    connect(m_ui->SetTaskButton,      &QPushButton::clicked, this, &TeacherDialog::setTask);
+    connect(m_ui->allGroupsListView,  &QListView::clicked,   this, [this](const QModelIndex& index){
                 QSqlQueryModel* querymodel = makeQuery("SELECT DISTINCT teams.team from groups join (SELECT students.group_id as group, teams.name as team "
                                                        "FROM students JOIN teams ON students.team_id = teams.id) AS teams ON teams.group = groups.id "
                                                        "WHERE groups.name = '" + index.data().toString() + "';");
                 m_ui->collectivesListView->setModel(querymodel);
     });
 
-    connect(m_ui->collectivesListView, &QListView::clicked, [this](const QModelIndex& index){
+    connect(m_ui->collectivesListView, &QListView::clicked, this, [this](const QModelIndex& index){
                 QSqlQueryModel* querymodel = makeQuery("select concat(students.surname, ' ', students.name) from teams join students "
                                                        "on students.team_id = teams.id where teams.name = '" + index.data().toString() + "' order by students.surname");
                 m_ui->studentsListView->setModel(querymodel);
@@ -58,6 +59,7 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
         querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
 
+        refresh();
         refresh();
         if (m_info.id != 1)
             m_ui->AdministrationButton->setEnabled(false);
@@ -114,6 +116,63 @@ void TeacherDialog::refresh()
         if (str != "")
         {
             m_ui->CreateTaskComboBox->addItem(str);
+            ++k;
+        }
+    }
+
+    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
+    int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    query->exec("SELECT COUNT(*) FROM teams WHERE id > 0 AND check_group(id, " + QString::number(object_id) + ");");
+    querymodel->setQuery(*query);
+    count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    k = 1;
+
+    m_ui->TeamsComboBox->clear();
+    for (int i = 1; k <= count; ++i) {
+        query->exec("SELECT name FROM teams WHERE id = " + QString::number(i) + " AND check_group(id, " + QString::number(object_id) + ");");
+        querymodel->setQuery(*query);
+        QString str = querymodel->data(querymodel->index(0, 0)).toString();
+        if (str != "")
+        {
+            m_ui->TeamsComboBox->addItem(str);
+            ++k;
+        }
+    }
+
+    query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + ";");
+    querymodel->setQuery(*query);
+    count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    k = 1;
+
+    m_ui->NameComboBox->clear();
+    for (int i = 1; k <= count; ++i) {
+        query->exec("SELECT name FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + ";");
+        querymodel->setQuery(*query);
+        QString str = querymodel->data(querymodel->index(0, 0)).toString();
+        if (str != "")
+        {
+            m_ui->NameComboBox->addItem(str);
+            ++k;
+        }
+    }
+
+    query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
+    querymodel->setQuery(*query);
+    count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    k = 1;
+
+    m_ui->VariantComboBox->clear();
+    for (int i = 1; k <= count; ++i) {
+        query->exec("SELECT variant FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
+        querymodel->setQuery(*query);
+        QString str = querymodel->data(querymodel->index(0, 0)).toString();
+        if (str != "")
+        {
+            m_ui->VariantComboBox->addItem(str);
             ++k;
         }
     }
@@ -264,19 +323,50 @@ void TeacherDialog::addTask() {
     QSqlQueryModel* querymodel = new QSqlQueryModel;
 
     querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
-    qDebug() << "SELECT id FROM object WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';";
     int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
-    querymodel = makeQuery("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + ";");
-    int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
 
     querymodel = makeQuery("SELECT COUNT(*) FROM labs WHERE name = '" + m_ui->NameLineEdit->text() + "' AND object = " + QString::number(object_id) + ";");
     int variant = querymodel->data(querymodel->index(0, 0)).toInt() + 1;
 
-    query->exec("INSERT INTO labs VALUES (DEFAULT, '" + m_ui->NameLineEdit->text() + "', " + QString::number(object_id) + ", " + QString::number(count + 1)
+    int number;
+    if (variant == 1) {
+        querymodel = makeQuery("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + ";");
+        number = querymodel->data(querymodel->index(0, 0)).toInt();
+    }
+    else {
+        querymodel = makeQuery("SELECT number FROM labs WHERE name = '" + m_ui->NameLineEdit->text() + "' AND object = " + QString::number(object_id) + ";");
+        number = querymodel->data(querymodel->index(0, 0)).toInt();
+    }
+
+
+    query->exec("INSERT INTO labs VALUES (DEFAULT, '" + m_ui->NameLineEdit->text() + "', " + QString::number(object_id) + ", " + QString::number(number)
                 + ", " + QString::number(variant) + ", '" + m_ui->TaskTextEdit->toPlainText() + "');");
-    qDebug() << "INSERT INTO labs VALUES (DEFAULT, '" + m_ui->NameLineEdit->text() + "', " + QString::number(object_id) + ", " + QString::number(count + 1)
-                + ", " + QString::number(variant) + ", '" + m_ui->TaskTextEdit->toPlainText() + "');";
+
+    m_ui->CreateTaskErrorLabel->setText("Успешно!");
+}
+
+void TeacherDialog::setTask() {
+    QSqlQuery* query = new QSqlQuery(*m_db);
+    QSqlQueryModel* querymodel = new QSqlQueryModel;
+
+    querymodel = makeQuery("SELECT id FROM teams WHERE name = '" + m_ui->TeamsComboBox->currentText() + "';");
+    int team_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT id FROM labs WHERE name = '" + m_ui->NameComboBox->currentText() + "' AND variant = " + m_ui->VariantComboBox->currentText() + ";");
+    int laba = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
+    int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+    querymodel = makeQuery("SELECT * FROM teams_and_labs JOIN labs ON teams_and_labs.laba = labs.id WHERE teams_and_labs.team = " + QString::number(team_id)
+                           + " AND labs.name = '" + m_ui->NameComboBox->currentText() + "' AND labs.object = " + QString::number(object_id) + ";");
+
+    if (querymodel->rowCount() != 0)
+        m_ui->CreateTaskErrorLabel->setText("Этот коллектив уже выполняет эту лабораторную работу");
+    else
+        query->exec("INSERT INTO teams_and_labs VALUES (" + QString::number(team_id) + ", " + QString::number(laba) + ");");
 }
 
 void TeacherDialog::exit(){

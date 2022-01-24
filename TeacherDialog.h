@@ -54,6 +54,7 @@ private slots:
     void signUpTeacher();
     void admin();
     void addTask();
+    void setTask();
 
 private:
     QSqlDatabase* m_db;
