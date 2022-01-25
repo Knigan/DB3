@@ -100,6 +100,8 @@ Administration::~Administration()
 }
 
 void Administration::refresh() {
+    ui->ErrorLabel->clear();
+
     combobox_work("objects", "name", ui->RemoveObjectComboBox);
     combobox_work("groups", "name", ui->GroupComboBox);
     combobox_work("objects", "name", ui->ObjectComboBox);
