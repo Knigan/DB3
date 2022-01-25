@@ -44,7 +44,7 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         int k = 1;
 
         m_ui->TeamsComboBox->clear();
-        query->exec("SELECT name FROM teams WHERE check_group(id, " + QString::number(object_id) + ");");
+        query->exec("SELECT name FROM teams WHERE id > 0 AND check_group(id, " + QString::number(object_id) + ");");
         while(query->next() || k <= count) {
             QString str = query->value(0).toString();
             if (str != "")
