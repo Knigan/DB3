@@ -32,14 +32,14 @@ Administration::Administration(QSqlDatabase* DB, QWidget *parent) :
         querymodel->setQuery(*query);
         int count = querymodel->data(querymodel->index(0, 0)).toInt();
 
-        int j = 1;
-        for (int i = 1; j <= count; ++i) {
-            query->exec("SELECT surname FROM students WHERE id = " + QString::number(i) + " AND group_id = " + QString::number(group_id) + ";");
-            querymodel->setQuery(*query);
-            QString str = querymodel->data(querymodel->index(0, 0)).toString();
-            if (str != "") {
+        int k = 1;
+        query->exec("SELECT surname FROM students WHERE group_id = " + QString::number(group_id) + ";");
+        while(query->next() || k <= count) {
+            QString str = query->value(0).toString();
+            if (str != "")
+            {
                 ui->StudentSurnameComboBox->addItem(str);
-                ++j;
+                ++k;
             }
         }
     });
@@ -57,15 +57,15 @@ Administration::Administration(QSqlDatabase* DB, QWidget *parent) :
         querymodel->setQuery(*query);
         int count = querymodel->data(querymodel->index(0, 0)).toInt();
 
-        int j = 1;
-        for (int i = 1; j <= count; ++i) {
-            query->exec("SELECT name FROM students WHERE id = " + QString::number(i) + " AND group_id = " + QString::number(group_id) + " AND surname = '"
-                        + ui->StudentSurnameComboBox->currentText() + "';");
-            querymodel->setQuery(*query);
-            QString str = querymodel->data(querymodel->index(0, 0)).toString();
-            if (str != "") {
+        int k = 1;
+        query->exec("SELECT name FROM students WHERE group_id = " + QString::number(group_id) + " AND surname = '"
+                                          + ui->StudentSurnameComboBox->currentText() + "';");
+        while(query->next() || k <= count) {
+            QString str = query->value(0).toString();
+            if (str != "")
+            {
                 ui->StudentNameComboBox->addItem(str);
-                ++j;
+                ++k;
             }
         }
     });
@@ -79,14 +79,15 @@ Administration::Administration(QSqlDatabase* DB, QWidget *parent) :
         querymodel->setQuery(*query);
         int count = querymodel->data(querymodel->index(0, 0)).toInt();
 
-        int j = 1;
-        for (int i = 1; j <= count; ++i) {
-            query->exec("SELECT name FROM teachers WHERE id = " + QString::number(i) + " AND surname = '" + ui->TeacherSurnameComboBox->currentText() + "';");
-            querymodel->setQuery(*query);
-            QString str = querymodel->data(querymodel->index(0, 0)).toString();
-            if (str != "") {
+        int k = 1;
+        query->exec("SELECT name FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText() + "';");
+
+        while(query->next() || k <= count) {
+            QString str = query->value(0).toString();
+            if (str != "")
+            {
                 ui->TeacherNameComboBox->addItem(str);
-                ++j;
+                ++k;
             }
         }
     });
@@ -120,14 +121,15 @@ void Administration::combobox_work(const QString& table, const QString& field, Q
     querymodel->setQuery(*query);
     int count = querymodel->data(querymodel->index(0, 0)).toInt();
 
-    int j = 1;
-    for (int i = 1; j <= count; ++i) {
-        query->exec("SELECT " + field + " FROM " + table + " WHERE id = " + QString::number(i) + ";");
-        querymodel->setQuery(*query);
-        QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        if (str != "") {
+    int k = 1;
+    query->exec("SELECT " + field + " FROM " + table + ";");
+
+    while(query->next() || k <= count) {
+        QString str = query->value(0).toString();
+        if (str != "")
+        {
             Box->addItem(str);
-            ++j;
+            ++k;
         }
     }
 }
