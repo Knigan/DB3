@@ -32,6 +32,66 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
                 m_ui->labsListView->setModel(querymodel);
     });
 
+    connect(m_ui->CreateTaskComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
+        QSqlQuery* query = new QSqlQuery(*m_db);
+        QSqlQueryModel* querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
+        int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        query->exec("SELECT COUNT(*) FROM teams WHERE id > 0 AND check_group(id, " + QString::number(object_id) + ");");
+        querymodel->setQuery(*query);
+        int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        int k = 1;
+
+        m_ui->TeamsComboBox->clear();
+        for (int i = 1; k <= count; ++i) {
+            query->exec("SELECT name FROM teams WHERE id = " + QString::number(i) + " AND check_group(id, " + QString::number(object_id) + ");");
+            querymodel->setQuery(*query);
+            QString str = querymodel->data(querymodel->index(0, 0)).toString();
+            if (str != "")
+            {
+                m_ui->TeamsComboBox->addItem(str);
+                ++k;
+            }
+        }
+
+        query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + ";");
+        querymodel->setQuery(*query);
+        count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        k = 1;
+
+        m_ui->NameComboBox->clear();
+        for (int i = 1; k <= count; ++i) {
+            query->exec("SELECT name FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + ";");
+            querymodel->setQuery(*query);
+            QString str = querymodel->data(querymodel->index(0, 0)).toString();
+            if (str != "")
+            {
+                m_ui->NameComboBox->addItem(str);
+                ++k;
+            }
+        }
+
+        query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
+        querymodel->setQuery(*query);
+        count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        k = 1;
+
+        m_ui->VariantComboBox->clear();
+        for (int i = 1; k <= count; ++i) {
+            query->exec("SELECT variant FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
+            querymodel->setQuery(*query);
+            QString str = querymodel->data(querymodel->index(0, 0)).toString();
+            if (str != "")
+            {
+                m_ui->VariantComboBox->addItem(str);
+                ++k;
+            }
+        }
+    });
+
     m_settings = new QSettings("teacher_config.ini", QSettings::IniFormat, this);
     TeacherSignIn T(m_db, m_settings);
     if (!T.exit) {
@@ -60,7 +120,6 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
         querymodel = makeQuery("SELECT DISTINCT name FROM objects;");
 
-        refresh();
         refresh();
         if (m_info.id != 1)
             m_ui->AdministrationButton->setEnabled(false);
@@ -117,63 +176,6 @@ void TeacherDialog::refresh()
         if (str != "")
         {
             m_ui->CreateTaskComboBox->addItem(str);
-            ++k;
-        }
-    }
-
-    querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
-    int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    query->exec("SELECT COUNT(*) FROM teams WHERE id > 0 AND check_group(id, " + QString::number(object_id) + ");");
-    querymodel->setQuery(*query);
-    count = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    k = 1;
-
-    m_ui->TeamsComboBox->clear();
-    for (int i = 1; k <= count; ++i) {
-        query->exec("SELECT name FROM teams WHERE id = " + QString::number(i) + " AND check_group(id, " + QString::number(object_id) + ");");
-        querymodel->setQuery(*query);
-        QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        if (str != "")
-        {
-            m_ui->TeamsComboBox->addItem(str);
-            ++k;
-        }
-    }
-
-    query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + ";");
-    querymodel->setQuery(*query);
-    count = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    k = 1;
-
-    m_ui->NameComboBox->clear();
-    for (int i = 1; k <= count; ++i) {
-        query->exec("SELECT name FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + ";");
-        querymodel->setQuery(*query);
-        QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        if (str != "")
-        {
-            m_ui->NameComboBox->addItem(str);
-            ++k;
-        }
-    }
-
-    query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
-    querymodel->setQuery(*query);
-    count = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    k = 1;
-
-    m_ui->VariantComboBox->clear();
-    for (int i = 1; k <= count; ++i) {
-        query->exec("SELECT variant FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
-        querymodel->setQuery(*query);
-        QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        if (str != "")
-        {
-            m_ui->VariantComboBox->addItem(str);
             ++k;
         }
     }
