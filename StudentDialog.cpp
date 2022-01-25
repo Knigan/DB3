@@ -50,28 +50,31 @@ StudentDialog::StudentDialog(QDialog *parent, QSqlDatabase* p)
         });
 
         connect(m_ui->listView, &QListView::doubleClicked, this, [this](const QModelIndex& index) {
-            srand(time(nullptr));
-            QSqlQuery* query = new QSqlQuery(*m_db);
-            QSqlQueryModel* querymodel = new QSqlQueryModel;
+            if (m_info.teamId != 0) {
+                srand(time(nullptr));
+                QSqlQuery* query = new QSqlQuery(*m_db);
+                QSqlQueryModel* querymodel = new QSqlQueryModel;
 
-            querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->ObjectsComboBox->currentText() + "';");
-            int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+                querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->ObjectsComboBox->currentText() + "';");
+                int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
-            querymodel = makeQuery("SELECT id FROM labs join teams_and_labs on teams_and_labs.laba = labs.id WHERE teams_and_labs.team = "
-                                   + QString::number(m_info.teamId) + " AND object = " + QString::number(object_id) + " AND name = '" + index.data().toString() + "';");
-            if (querymodel->rowCount() != 0)
-                m_ui->ErrorLabel->setText("Вы уже получили это задание!");
-            else {
+                querymodel = makeQuery("SELECT id FROM labs join teams_and_labs on teams_and_labs.laba = labs.id WHERE teams_and_labs.team = "
+                                       + QString::number(m_info.teamId) + " AND object = " + QString::number(object_id) + " AND name = '" + index.data().toString() + "';");
+                if (querymodel->rowCount() != 0)
+                    m_ui->ErrorLabel->setText("Вы уже получили это задание!");
+                else {
 
-                querymodel = makeQuery("SELECT COUNT(*) FROM labs WHERE name = '" + index.data().toString() + "' AND object = " + QString::number(object_id) + ";");
-                int count = querymodel->data(querymodel->index(0, 0)).toInt();
+                    querymodel = makeQuery("SELECT COUNT(*) FROM labs WHERE name = '" + index.data().toString() + "' AND object = " + QString::number(object_id) + ";");
+                    int count = querymodel->data(querymodel->index(0, 0)).toInt();
 
-                int variant = rand() % count + 1;
-                querymodel = makeQuery("SELECT id FROM labs WHERE name = '" + index.data().toString() + "' AND object = "
-                                       + QString::number(object_id) + " AND variant = " + QString::number(variant) + ";");
-                int id = querymodel->data(querymodel->index(0, 0)).toInt();
+                    int variant = rand() % count + 1;
+                    querymodel = makeQuery("SELECT id FROM labs WHERE name = '" + index.data().toString() + "' AND object = "
+                                           + QString::number(object_id) + " AND variant = " + QString::number(variant) + ";");
+                    int id = querymodel->data(querymodel->index(0, 0)).toInt();
 
-                query->exec("INSERT INTO teams_and_labs(team, laba) VALUES (" + QString::number(m_info.teamId) + ", " + QString::number(id) + ");");
+                    query->exec("INSERT INTO teams_and_labs(team, laba) VALUES (" + QString::number(m_info.teamId) + ", " + QString::number(id) + ");");
+
+                }
 
             }
 
