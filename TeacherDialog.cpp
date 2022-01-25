@@ -105,8 +105,14 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         m_info.name      = querymodel->data(querymodel->index(0,2)).toString();
         m_info.surname   = querymodel->data(querymodel->index(0,3)).toString();
         QString subject;
-        querymodel = makeQuery("SELECT name FROM objects WHERE objects.id = " + QString::number(m_info.id) + ";");
-        subject = querymodel->data(querymodel->index(0,0)).toString();
+        querymodel = makeQuery("SELECT objects.name FROM objects JOIN teachers ON objects.id = teachers.object WHERE teachers.surname = '"
+                               + m_info.surname + "' AND teachers.name = '" + m_info.name + "';");
+        for (int i = 0; i < querymodel->rowCount(); ++i) {
+            if (i != querymodel->rowCount() - 1)
+                subject += querymodel->data(querymodel->index(i, 0)).toString() + ", ";
+            else
+                subject += querymodel->data(querymodel->index(i, 0)).toString();
+        }
 
         m_ui->infoLoginLabel->setText(m_info.login);
         m_ui->infoNameLabel->setText(m_info.name);
