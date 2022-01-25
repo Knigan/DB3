@@ -8,15 +8,89 @@ Administration::Administration(QSqlDatabase* DB, QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->AddObjectButton, &QPushButton::clicked, this, &Administration::addObject);
-    connect(ui->RemoveObjectButton, &QPushButton::clicked, this, &Administration::removeObject);
+    connect(ui->AddObjectButton,     &QPushButton::clicked, this, &Administration::addObject);
+    connect(ui->RemoveObjectButton,  &QPushButton::clicked, this, &Administration::removeObject);
     connect(ui->RemoveStudentButton, &QPushButton::clicked, this, &Administration::removeStudent);
     connect(ui->RemoveTeacherButton, &QPushButton::clicked, this, &Administration::removeTeacher);
-    connect(ui->AssignObject, &QPushButton::clicked, this, &Administration::assignObject);
-    connect(ui->GroupButton, &QPushButton::clicked, this, &Administration::createGroup);
-    connect(ui->SetTeacherButton, &QPushButton::clicked, this, &Administration::setTeacher);
+    connect(ui->AssignObject,        &QPushButton::clicked, this, &Administration::assignObject);
+    connect(ui->GroupButton,         &QPushButton::clicked, this, &Administration::createGroup);
+    connect(ui->SetTeacherButton,    &QPushButton::clicked, this, &Administration::setTeacher);
+
 
     refresh();
+    ui->ErrorLabel->clear();
+
+    connect(ui->StudentGroupComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](){
+        ui->StudentSurnameComboBox->clear();
+        QSqlQuery* query = new QSqlQuery(*db);
+        QSqlQueryModel* querymodel = new QSqlQueryModel;
+
+        querymodel = makeQuery("SELECT id FROM groups WHERE name = '" + ui->StudentGroupComboBox->currentText() + "';");
+        int group_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        query->exec("SELECT COUNT(*) FROM students WHERE group_id = " + QString::number(group_id) + ";");
+        querymodel->setQuery(*query);
+        int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        int j = 1;
+        for (int i = 1; j <= count; ++i) {
+            query->exec("SELECT surname FROM students WHERE id = " + QString::number(i) + " AND group_id = " + QString::number(group_id) + ";");
+            querymodel->setQuery(*query);
+            QString str = querymodel->data(querymodel->index(0, 0)).toString();
+            if (str != "") {
+                ui->StudentSurnameComboBox->addItem(str);
+                ++j;
+            }
+        }
+    });
+
+    connect(ui->StudentSurnameComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](){
+        ui->StudentNameComboBox->clear();
+        QSqlQuery* query = new QSqlQuery(*db);
+        QSqlQueryModel* querymodel = new QSqlQueryModel;
+
+        querymodel = makeQuery("SELECT id FROM groups WHERE name = '" + ui->StudentGroupComboBox->currentText() + "';");
+        int group_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        query->exec("SELECT COUNT(*) FROM students WHERE group_id = " + QString::number(group_id) + " AND surname = '"
+                    + ui->StudentSurnameComboBox->currentText() + "';");
+        querymodel->setQuery(*query);
+        int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        int j = 1;
+        for (int i = 1; j <= count; ++i) {
+            query->exec("SELECT name FROM students WHERE id = " + QString::number(i) + " AND group_id = " + QString::number(group_id) + " AND surname = '"
+                        + ui->StudentSurnameComboBox->currentText() + "';");
+            querymodel->setQuery(*query);
+            QString str = querymodel->data(querymodel->index(0, 0)).toString();
+            if (str != "") {
+                ui->StudentNameComboBox->addItem(str);
+                ++j;
+            }
+        }
+    });
+
+    connect(ui->TeacherSurnameComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
+        ui->TeacherNameComboBox->clear();
+        QSqlQuery* query = new QSqlQuery(*db);
+        QSqlQueryModel* querymodel = new QSqlQueryModel;
+
+        query->exec("SELECT COUNT(*) FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText() + "';");
+        querymodel->setQuery(*query);
+        int count = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        int j = 1;
+        for (int i = 1; j <= count; ++i) {
+            query->exec("SELECT name FROM teachers WHERE id = " + QString::number(i) + " AND surname = '" + ui->TeacherSurnameComboBox->currentText() + "';");
+            querymodel->setQuery(*query);
+            QString str = querymodel->data(querymodel->index(0, 0)).toString();
+            if (str != "") {
+                ui->TeacherNameComboBox->addItem(str);
+                ++j;
+            }
+        }
+    });
+
     exec();
 }
 
@@ -30,11 +104,10 @@ void Administration::refresh() {
     combobox_work("groups", "name", ui->GroupComboBox);
     combobox_work("objects", "name", ui->ObjectComboBox);
     combobox_work("groups", "name", ui->StudentGroupComboBox);
-    combobox_work("students", "surname", ui->StudentSurnameComboBox);
-    combobox_work("students", "name", ui->StudentNameComboBox);
     combobox_work("objects", "name", ui->TeacherObjectComboBox);
     combobox_work("teachers", "surname", ui->TeacherSurnameComboBox);
-    combobox_work("teachers", "name", ui->TeacherNameComboBox);
+
+    ui->ErrorLabel->setText("Успешно!");
 }
 
 void Administration::combobox_work(const QString& table, const QString& field, QComboBox* Box) {
@@ -80,13 +153,11 @@ void Administration::addObject() {
     else {
         if (str != "") {
             query->exec("INSERT INTO objects VALUES (DEFAULT, '" + str + "');");
-            ui->ErrorLabel->setText("Успешно!");
+            refresh();
         }
         else
             ui->ErrorLabel->setText("Введите название предмета!");
     }
-
-    refresh();
 }
 
 void Administration::removeObject() {
@@ -112,10 +183,9 @@ void Administration::removeStudent() {
         query->exec("DELETE FROM students WHERE surname = '" + ui->StudentSurnameComboBox->currentText()
                     + "' AND name = '" + ui->StudentNameComboBox->currentText() + "' AND group_id = "
                     + QString::number(group_id) + ";");
-        ui->ErrorLabel->setText("Успешно!");
+        refresh();
     }
 
-    refresh();
 }
 
 void Administration::removeTeacher() {
@@ -139,13 +209,12 @@ void Administration::removeTeacher() {
             query->exec("DELETE FROM teachers WHERE surname = '" + ui->TeacherSurnameComboBox->currentText()
                         + "' AND name = '" + ui->TeacherNameComboBox->currentText()
                         + "' AND object = " + QString::number(object_id) + ";");
-            ui->ErrorLabel->setText("Успешно!");
+            refresh();
         }
         else
             ui->ErrorLabel->setText("Нельзя удалить старшего преподавателя!");
 
     }
-    refresh();
 }
 
 void Administration::setTeacher() {
@@ -173,10 +242,8 @@ void Administration::setTeacher() {
                     + "', " + QString::number(object_id)
                     + ", '" + login + "', '" + password + "');");
 
-        ui->ErrorLabel->setText("Успешно!");
+        refresh();
     }
-
-    refresh();
 }
 
 void Administration::assignObject() {
@@ -189,9 +256,13 @@ void Administration::assignObject() {
     querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + ui->ObjectComboBox->currentText() + "';");
     int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
 
-    query->exec("INSERT INTO groups_and_objects VALUES (" + QString::number(group_id) + ", " + QString::number(object_id) + ");");
-    ui->ErrorLabel->setText("Успешно!");
-    refresh();
+    querymodel = makeQuery("SELECT * FROM groups_and_objects WHERE group_id = " + QString::number(group_id) + " AND object_id = " + QString::number(object_id) + ";");
+    if (querymodel->rowCount() != 0)
+        ui->ErrorLabel->setText("Эта группа уже изучает выбранный предмет!");
+    else {
+        query->exec("INSERT INTO groups_and_objects VALUES (" + QString::number(group_id) + ", " + QString::number(object_id) + ");");
+        refresh();
+    }
 }
 
 void Administration::createGroup() {
@@ -206,11 +277,9 @@ void Administration::createGroup() {
     else {
         if (str != "") {
             query->exec("INSERT INTO groups VALUES (DEFAULT, '" + str + "');");
-            ui->ErrorLabel->setText("Успешно!");
+            refresh();
         }
         else
             ui->ErrorLabel->setText("Введите имя группы!");
     }
-
-    refresh();
 }
