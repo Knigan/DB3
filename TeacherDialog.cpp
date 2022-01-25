@@ -85,12 +85,6 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         m_ui->VariantComboBox->clear();
         m_ui->VariantComboBox->addItem("");
 
-        querymodel = makeQuery("SELECT id FROM teams WHERE name = '" + m_ui->TeamsComboBox->currentText() + "';");
-        int team_id = querymodel->data(querymodel->index(0, 0)).toInt();
-
-        querymodel = makeQuery("SELECT task FROM labs WHERE team_id = " + QString::number(team_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
-        QString txt = querymodel->data(querymodel->index(0, 0)).toString();
-        m_ui->TaskTextEdit->setText(txt);
         query->exec("SELECT variant FROM labs WHERE object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
 
         while(query->next() || k <= count) {
@@ -100,6 +94,27 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
                 m_ui->VariantComboBox->addItem(str);
                 ++k;
             }
+        }
+    });
+
+    connect(m_ui->VariantComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
+        QSqlQueryModel* querymodel = makeQuery("SELECT id FROM teams WHERE name = '" + m_ui->TeamsComboBox->currentText() + "';");
+        int team_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
+        int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
+
+        querymodel = makeQuery("SELECT task FROM labs JOIN teams_and_labs ON labs.id = teams_and_labs.laba WHERE teams_and_labs.team = " + QString::number(team_id) + " AND labs.name = '" + m_ui->NameComboBox->currentText() + "' AND object = " + QString::number(object_id) + ";");
+        qDebug() << "SELECT task FROM labs JOIN teams_and_labs ON labs.id = teams_and_labs.laba WHERE teams_and_labs.team = " + QString::number(team_id) + " AND labs.name = '" + m_ui->NameComboBox->currentText() + "' AND object = " + QString::number(object_id) + ";";
+        QString txt = querymodel->data(querymodel->index(0, 0)).toString();
+
+        if (m_ui->VariantComboBox->currentIndex() == 0)
+            m_ui->TaskTextEdit->setText(txt);
+        else {
+            QString var = m_ui->VariantComboBox->currentText();
+            querymodel = makeQuery("SELECT task FROM labs WHERE name = '" + m_ui->NameComboBox->currentText() + "' AND variant = " + var + " AND object = " + QString::number(object_id) + ";");
+            QString txt2 = querymodel->data(querymodel->index(0, 0)).toString();
+            m_ui->TaskTextEdit->setText(txt2);
         }
     });
 

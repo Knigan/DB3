@@ -14,14 +14,16 @@ SignUp::SignUp(QWidget *parent, QSqlDatabase* DB) :
     query->exec("SELECT COUNT(*) FROM groups");
     querymodel->setQuery(*query);
     int count = querymodel->data(querymodel->index(0, 0)).toInt();
-
-    for (int i = 1; i <= count; ++i) {
-        query->exec("SELECT name FROM groups WHERE id = " + QString::number(i) + ";");
-        querymodel->setQuery(*query);
-        QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        ui->comboBox->addItem(str);
+    query->exec("SELECT name FROM groups;");
+    int k = 1;
+    while(query->next() || k <= count) {
+        QString str = query->value(0).toString();
+        if (str != "")
+        {
+            ui->comboBox->addItem(str);
+            ++k;
+        }
     }
-
     connect(ui->SignUpButton, &QPushButton::clicked, this, &SignUp::signup);
     exec();
 }
