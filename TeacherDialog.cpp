@@ -72,16 +72,22 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
                 ++k;
             }
         }
+    });
 
+    connect(m_ui->NameComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
+        QSqlQuery* query = new QSqlQuery(*m_db);
+        QSqlQueryModel* querymodel = makeQuery("SELECT id FROM objects WHERE name = '" + m_ui->CreateTaskComboBox->currentText() + "';");
+        int object_id = querymodel->data(querymodel->index(0, 0)).toInt();
         query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
         querymodel->setQuery(*query);
-        count = querymodel->data(querymodel->index(0, 0)).toInt();
+        int count = querymodel->data(querymodel->index(0, 0)).toInt();
 
-        k = 1;
+        int k = 1;
 
         m_ui->VariantComboBox->clear();
         for (int i = 1; k <= count; ++i) {
             query->exec("SELECT variant FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
+            qDebug() << "SELECT variant FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';";
             querymodel->setQuery(*query);
             QString str = querymodel->data(querymodel->index(0, 0)).toString();
             if (str != "")
@@ -104,20 +110,10 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         m_info.subjectId = querymodel->data(querymodel->index(0,1)).toInt();
         m_info.name      = querymodel->data(querymodel->index(0,2)).toString();
         m_info.surname   = querymodel->data(querymodel->index(0,3)).toString();
-        QString subject;
-        querymodel = makeQuery("SELECT objects.name FROM objects JOIN teachers ON objects.id = teachers.object WHERE teachers.surname = '"
-                               + m_info.surname + "' AND teachers.name = '" + m_info.name + "';");
-        for (int i = 0; i < querymodel->rowCount(); ++i) {
-            if (i != querymodel->rowCount() - 1)
-                subject += querymodel->data(querymodel->index(i, 0)).toString() + ", ";
-            else
-                subject += querymodel->data(querymodel->index(i, 0)).toString();
-        }
 
         m_ui->infoLoginLabel->setText(m_info.login);
         m_ui->infoNameLabel->setText(m_info.name);
         m_ui->infoSurnameLable->setText(m_info.surname);
-        m_ui->infoSubjectLabel->setText(subject);
 
         querymodel = makeQuery("select name from groups join (select group_id, objects.id as subject "
                                "from groups_and_objects join objects on groups_and_objects.object_id = objects.id) "
@@ -185,6 +181,18 @@ void TeacherDialog::refresh()
             ++k;
         }
     }
+
+    QString subject;
+    querymodel = makeQuery("SELECT objects.name FROM objects JOIN teachers ON objects.id = teachers.object WHERE teachers.surname = '"
+                           + m_info.surname + "' AND teachers.name = '" + m_info.name + "';");
+    for (int i = 0; i < querymodel->rowCount(); ++i) {
+        if (i != querymodel->rowCount() - 1)
+            subject += querymodel->data(querymodel->index(i, 0)).toString() + ", ";
+        else
+            subject += querymodel->data(querymodel->index(i, 0)).toString();
+    }
+    m_ui->infoSubjectLabel->setText(subject);
+
 }
 
 void TeacherDialog::signUpTeacher() {
