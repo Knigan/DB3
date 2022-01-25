@@ -15,7 +15,7 @@ class EnterCollectiveDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit EnterCollectiveDialog(QSqlDatabase* db = nullptr, QWidget *parent = nullptr);
+    explicit EnterCollectiveDialog(int id, QSqlDatabase* db = nullptr, QWidget *parent = nullptr);
     ~EnterCollectiveDialog();
     QString getName();
 
@@ -23,6 +23,7 @@ private:
     Ui::EnterCollectiveDialog *ui;
 
     QSqlDatabase* DB;
+    int group_id;
 };
 
 #endif // ENTERCOLLECTIVEDIALOG_H

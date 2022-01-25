@@ -430,7 +430,7 @@ QSqlQueryModel* StudentDialog::makeQuery(const QString& queryString)
 
 void StudentDialog::enterCollective()
 {
-     EnterCollectiveDialog d(m_db);
+     EnterCollectiveDialog d(m_info.groupId, m_db);
      if (d.exec() == QDialog::Accepted)
      {
          if (m_info.teamId == 0)
