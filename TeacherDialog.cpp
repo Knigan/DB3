@@ -87,7 +87,6 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
         m_ui->VariantComboBox->clear();
         for (int i = 1; k <= count; ++i) {
             query->exec("SELECT variant FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';");
-            qDebug() << "SELECT variant FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + " AND name = '" + m_ui->NameComboBox->currentText() + "';";
             querymodel->setQuery(*query);
             QString str = querymodel->data(querymodel->index(0, 0)).toString();
             if (str != "")

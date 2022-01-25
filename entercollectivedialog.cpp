@@ -12,15 +12,19 @@ EnterCollectiveDialog::EnterCollectiveDialog(int id, QSqlDatabase* db, QWidget *
     QSqlQuery* query = new QSqlQuery(*DB);
     QSqlQueryModel* querymodel = new QSqlQueryModel;
 
-    query->exec("SELECT COUNT(*) FROM teams WHERE id != 0 AND check_group(id, " + QString::number(group_id) + ");");
+    query->exec("SELECT COUNT(*) FROM teams WHERE id != 0 AND check_team(id, " + QString::number(group_id) + ");");
     querymodel->setQuery(*query);
     int count = querymodel->data(querymodel->index(0, 0)).toInt();
 
-    for (int i = 1; i <= count; ++i) {
-        query->exec("SELECT name FROM teams WHERE id = " + QString::number(i) + " AND check_group(id, " + QString::number(group_id) + ");");
+    int k = 1;
+    for (int i = 1; k <= count; ++i) {
+        query->exec("SELECT name FROM teams WHERE id = " + QString::number(i) + " AND check_team(id, " + QString::number(group_id) + ");");
         querymodel->setQuery(*query);
         QString str = querymodel->data(querymodel->index(0, 0)).toString();
-        ui->comboBox->addItem(str);
+        if (str != "") {
+            ui->comboBox->addItem(str);
+            ++k;
+        }
     }
 
 }
