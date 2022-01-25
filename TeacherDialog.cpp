@@ -55,7 +55,7 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
             }
         }
 
-        query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + ";");
+        query->exec("SELECT COUNT(*) FROM labs WHERE object = " + QString::number(object_id) + " AND variant = 1;");
         querymodel->setQuery(*query);
         count = querymodel->data(querymodel->index(0, 0)).toInt();
 
@@ -63,7 +63,7 @@ TeacherDialog::TeacherDialog(QDialog *parent, QSqlDatabase* p) :
 
         m_ui->NameComboBox->clear();
         for (int i = 1; k <= count; ++i) {
-            query->exec("SELECT name FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + ";");
+            query->exec("SELECT name FROM labs WHERE id = " + QString::number(i) + " AND object = " + QString::number(object_id) + " AND variant = 1;");
             querymodel->setQuery(*query);
             QString str = querymodel->data(querymodel->index(0, 0)).toString();
             if (str != "")
